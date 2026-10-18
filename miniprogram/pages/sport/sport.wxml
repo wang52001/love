@@ -1,0 +1,182 @@
+<view class="container">
+  <view class="sport-header">
+    <view class="sport-emoji animate-float">🏃</view>
+    <view class="page-title">一起运动</view>
+    <view class="page-sub mt-8">记录共同健康生活，一起变得更好</view>
+  </view>
+
+  <view class="stats-card glass-card mt-32">
+    <view class="stats-period muted fs-22">{{stats.week_start}} ~ {{stats.week_end}}</view>
+    <view class="stats-grid mt-20">
+      <view class="stats-item">
+        <view class="stats-num gradient-text fw-900">{{stats.checkin_days || 0}}</view>
+        <view class="stats-label muted fs-22 mt-6">打卡天数</view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <view class="stats-num sun-text fw-900">{{stats.total_steps || 0}}</view>
+        <view class="stats-label muted fs-22 mt-6">总步数</view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <view class="stats-num rainbow-text fw-900">{{stats.total_distance || '0.0'}}</view>
+        <view class="stats-label muted fs-22 mt-6">公里数</view>
+      </view>
+    </view>
+    <view class="stats-vs mt-24">
+      <view class="vs-side">
+        <text class="vs-tag">我</text>
+        <text class="vs-count fw-700">{{stats.my_count || 0}}</text>
+        <text class="muted fs-22">次</text>
+      </view>
+      <view class="vs-divider">VS</view>
+      <view class="vs-side">
+        <text class="vs-tag">TA</text>
+        <text class="vs-count fw-700">{{stats.ta_count || 0}}</text>
+        <text class="muted fs-22">次</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="goal-card glass-card mt-24">
+    <view class="goal-header row-between">
+      <view>
+        <view class="goal-title fw-700 fs-28">本周目标</view>
+        <view class="goal-desc muted fs-22 mt-4">{{goal.daily_steps}} 步/天 · {{goal.weekly_days}} 天/周</view>
+      </view>
+      <view class="goal-edit muted fs-22" bindtap="openGoalModal">编辑</view>
+    </view>
+    <view class="goal-progress-bg mt-20">
+      <view class="goal-progress-fill" style="width: {{goalProgress}}%;"></view>
+    </view>
+    <view class="goal-progress-text mt-12 muted fs-22">已完成 {{stats.checkin_days || 0}} / {{goal.weekly_days}} 天</view>
+  </view>
+
+  <view class="today-card glass-card mt-24">
+    <view class="today-header row-between">
+      <view class="today-title fw-700 fs-28">今日打卡</view>
+      <view class="today-count muted fs-22">我 {{today.my_count}} 次 · TA {{today.ta_count}} 次</view>
+    </view>
+    <view class="today-actions mt-20">
+      <view class="btn btn-primary flex-1" bindtap="openStartModal">
+        <text>▶ 开始运动</text>
+      </view>
+      <view class="btn btn-outline flex-1" bindtap="openCheckinModal">
+        <text>＋ 补录</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-title mt-40 mb-16">📅 本周记录</view>
+  <view class="record-list" wx:if="{{weeklyList.length}}">
+    <view class="record-item glass-card" wx:for="{{weeklyList}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="record-left">
+        <view class="record-emoji">{{item.type_emoji}}</view>
+        <view class="record-info">
+          <view class="record-title fw-600 fs-28">{{item.type_name}} · {{item.format_duration}}</view>
+          <view class="record-meta muted fs-20 mt-4">{{item.sport_date}} · {{item.user_name || 'TA'}}</view>
+          <view class="record-tags mt-8" wx:if="{{item.steps || item.distance}}">
+            <text class="tag-mini" wx:if="{{item.steps}}">👣 {{item.steps}} 步</text>
+            <text class="tag-mini" wx:if="{{item.distance}}">📍 {{item.distance}} 公里</text>
+            <text class="tag-mini" wx:if="{{item.track_count}}">🗺 {{item.track_count}} 轨迹点</text>
+          </view>
+          <view class="record-note muted fs-22 mt-8" wx:if="{{item.note}}">💭 {{item.note}}</view>
+        </view>
+      </view>
+      <view class="record-del muted fs-22" catchtap="deleteRecord" data-id="{{item.id}}">删除</view>
+    </view>
+  </view>
+  <view wx:else class="empty-card glass-card mt-24">
+    <text class="empty-emoji">📅</text>
+    <text class="empty-tip muted fs-24 mt-12">本周还没有记录，一起动起来吧</text>
+  </view>
+
+  <view class="fab" bindtap="openStartModal">
+    <text class="fab-icon">＋</text>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showStartModal}}" bindtap="closeStartModal"></view>
+  <view class="modal-content {{showStartModal ? 'show' : ''}}" wx:if="{{showStartModal}}">
+    <view class="modal-title">选择运动类型</view>
+    <view class="type-select justify-center mt-32">
+      <view
+        class="type-chip-big {{startType === item.key ? 'active' : ''}}"
+        wx:for="{{sportTypes}}"
+        wx:key="key"
+        bindtap="selectStartType"
+        data-key="{{item.key}}"
+      >
+        <view class="type-big-emoji">{{item.emoji}}</view>
+        <view class="type-big-name">{{item.name}}</view>
+      </view>
+    </view>
+    <view class="modal-actions mt-40">
+      <view class="btn btn-outline flex-1" bindtap="closeStartModal">取消</view>
+      <view class="btn btn-primary flex-1" bindtap="startRealSport">开始</view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showCheckinModal}}" bindtap="closeCheckinModal"></view>
+  <view class="modal-content {{showCheckinModal ? 'show' : ''}}" wx:if="{{showCheckinModal}}">
+    <view class="modal-title">记一笔运动</view>
+    <view class="form-row mt-24">
+      <text class="form-label">类型</text>
+      <view class="type-select">
+        <view
+          class="type-chip {{checkinForm.sport_type === item.key ? 'active' : ''}}"
+          wx:for="{{sportTypes}}"
+          wx:key="key"
+          bindtap="selectType"
+          data-key="{{item.key}}"
+        >
+          {{item.emoji}} {{item.name}}
+        </view>
+      </view>
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">时长(分)</text>
+      <input class="form-input" type="digit" placeholder="30" value="{{checkinForm.duration}}" bindinput="onDurationInput" />
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">距离(公里)</text>
+      <input class="form-input" type="digit" placeholder="2.5" value="{{checkinForm.distance}}" bindinput="onDistanceInput" />
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">步数</text>
+      <input class="form-input" type="digit" placeholder="3000" value="{{checkinForm.steps}}" bindinput="onStepsInput" />
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">备注</text>
+      <input class="form-input" placeholder="和TA一起散步…" value="{{checkinForm.note}}" bindinput="onNoteInput" />
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">日期</text>
+      <picker mode="date" value="{{checkinForm.sport_date}}" bindchange="onDateChange">
+        <view class="form-picker">{{checkinForm.sport_date}}</view>
+      </picker>
+    </view>
+    <view class="modal-actions mt-32">
+      <view class="btn btn-outline flex-1" bindtap="closeCheckinModal">取消</view>
+      <view class="btn btn-primary flex-1" bindtap="saveCheckin">保存</view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showGoalModal}}" bindtap="closeGoalModal"></view>
+  <view class="modal-content {{showGoalModal ? 'show' : ''}}" wx:if="{{showGoalModal}}">
+    <view class="modal-title">设置本周目标</view>
+    <view class="form-row mt-24">
+      <text class="form-label">每日步数</text>
+      <input class="form-input" type="digit" placeholder="6000" value="{{goalForm.daily_steps}}" bindinput="onGoalStepsInput" />
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">每周天数</text>
+      <input class="form-input" type="digit" placeholder="5" value="{{goalForm.weekly_days}}" bindinput="onGoalDaysInput" />
+    </view>
+    <view class="modal-actions mt-32">
+      <view class="btn btn-outline flex-1" bindtap="closeGoalModal">取消</view>
+      <view class="btn btn-primary flex-1" bindtap="saveGoal">保存</view>
+    </view>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>

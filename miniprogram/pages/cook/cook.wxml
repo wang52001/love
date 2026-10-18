@@ -1,0 +1,112 @@
+<view class="container">
+  <view class="page-header">
+    <view class="page-title">今天吃什么</view>
+    <view class="page-sub mt-8">{{isCook ? '你是今天的做饭担当 🍳' : '点餐让 TA 为你做顿好吃的 💕'}}</view>
+  </view>
+
+  <image class="cook-hero-img" src="/images/cook-hero.jpg" mode="widthFix" lazy-load></image>
+
+  <view class="cook-card glass-card mt-32" wx:if="{{!cookUser}}">
+    <view class="cook-hero">
+      <view class="cook-hero-emoji">🍳</view>
+      <view class="cook-title fw-700 fs-28">还没有指定做饭方</view>
+      <view class="cook-desc muted fs-22 mt-8">情侣中需要有一方负责做饭，另一方可以点餐</view>
+    </view>
+    <view class="cook-actions mt-24">
+      <button class="btn btn-primary" style="border:none;" bindtap="assignMe">我来做饭</button>
+      <button class="btn btn-primary" style="border:none;" wx:if="{{ta}}" bindtap="assignTa">让 TA 做饭</button>
+    </view>
+  </view>
+
+  <view class="announcement-card glass-card mt-24" wx:if="{{announcements.length}}">
+    <view class="announcement-title fw-700 fs-26">📢 公告</view>
+    <view class="announcement-item" wx:for="{{announcements}}" wx:key="id">
+      <text class="announcement-text">{{item.content}}</text>
+    </view>
+  </view>
+
+  <block wx:if="{{cookUser}}">
+    <view class="card glass-card mt-24">
+      <view class="row-between">
+        <view class="card-title fw-700 fs-28">🍽️ {{isCook ? '我的菜单' : 'TA 的菜单'}}</view>
+        <view class="muted fs-22" bindtap="switchCook">切换做饭方 ›</view>
+      </view>
+      <view class="dish-list mt-20">
+        <view class="dish-item {{selectedDishIds[item.id] ? 'selected' : ''}}" wx:for="{{dishes}}" wx:key="id" bindtap="toggleDish" data-id="{{item.id}}">
+          <image wx:if="{{item.imageUrl}}" class="dish-thumb" src="{{item.imageUrl}}" mode="aspectFill" catchtap="previewDishImage" data-url="{{item.imageUrl}}"></image>
+          <view wx:else class="dish-thumb dish-thumb-placeholder">🍽️</view>
+          <text class="dish-name">{{item.name}}</text>
+          <text wx:if="{{isCook}}" class="dish-del" catchtap="deleteDish" data-id="{{item.id}}">×</text>
+          <view wx:if="{{!isCook && selectedDishIds[item.id]}}" class="dish-check">✓</view>
+        </view>
+      </view>
+      <view wx:if="{{!dishes.length}}" class="empty-tip muted fs-22">🍲 还没有菜品，快去添加吧</view>
+
+      <view class="add-dish-box mt-24" wx:if="{{isCook}}">
+        <view class="add-dish-title">➕ 添加新菜品</view>
+        <input class="add-dish-input mt-16" placeholder="例如：红烧肉" value="{{newDish}}" bindinput="onDishInput" />
+        <view class="add-dish-actions mt-16">
+          <view class="dish-img-section" bindtap="chooseDishImage">
+            <view class="dish-img-pick {{newDishImage ? 'has-image' : ''}}">
+              <image wx:if="{{newDishImage}}" class="dish-img-preview" src="{{newDishImage}}" mode="aspectFill"></image>
+              <block wx:else>
+                <text class="dish-img-plus">📷</text>
+                <text class="dish-img-tip">选图</text>
+              </block>
+              <text wx:if="{{newDishImage}}" class="dish-img-remove" catchtap="removeDishImage">×</text>
+            </view>
+          </view>
+          <button class="btn btn-primary btn-add-dish" style="border:none;" bindtap="addDish">添加菜品</button>
+        </view>
+      </view>
+
+      <view class="order-box mt-24" wx:if="{{!isCook}}">
+        <view class="order-box-title">🛒 点单</view>
+        <picker bindchange="onMealChange" value="{{mealIndex}}" range="{{meals}}">
+          <view class="picker muted fs-26">{{meals[mealIndex]}} ▾</view>
+        </picker>
+        <view class="dish-note-list mt-16" wx:if="{{selectedDishList.length}}">
+          <view class="dish-note-item" wx:for="{{selectedDishList}}" wx:key="id">
+            <text class="dish-note-name">{{item.name}}</text>
+            <input class="dish-note-input" placeholder="少辣/多饭/免葱…" value="{{item.note}}" data-id="{{item.id}}" bindinput="onDishNoteInput" />
+          </view>
+        </view>
+        <input class="form-input mt-16" placeholder="整体备注（可选）" value="{{orderNote}}" bindinput="onOrderNoteInput" />
+        <button class="btn btn-primary btn-submit-order mt-20" style="border:none;" bindtap="submitOrder">下单给 TA</button>
+      </view>
+    </view>
+
+    <view class="card glass-card mt-24">
+      <view class="card-title fw-700 fs-28">📋 今日订单</view>
+      <view class="order-list mt-20">
+        <view class="order-item" wx:for="{{orders}}" wx:key="id">
+          <view class="order-top row-between">
+            <text class="fw-600">{{item.meal_type}} · {{item.order_name}}</text>
+            <text class="order-status status-{{item.status}}">{{item.statusText}}</text>
+          </view>
+          <view class="order-dishes mt-12">{{item.dishNames}}</view>
+          <view class="order-dish-note mt-12" wx:if="{{item.dishNotes.length}}">
+            <view class="order-dish-note-line" wx:for="{{item.dishNotes}}" wx:for-item="dn" wx:key="id">
+              <text class="order-dish-note-name">{{dn.name}}</text>
+              <text class="order-dish-note-text">{{dn.note}}</text>
+            </view>
+          </view>
+          <view class="order-note mt-12" wx:if="{{item.note}}">整体备注：{{item.note}}</view>
+          <view class="order-actions mt-12" wx:if="{{isCook && item.status === 'pending'}}">
+            <button class="btn btn-sm btn-primary" style="border:none;" bindtap="setOrderStatus" data-id="{{item.id}}" data-status="done">已做好</button>
+            <button class="btn btn-sm btn-outline" style="border:none;" bindtap="setOrderStatus" data-id="{{item.id}}" data-status="cancel">取消</button>
+          </view>
+        </view>
+      </view>
+      <view wx:if="{{!orders.length}}" class="empty-tip muted fs-22">🍽️ 今天还没有订单</view>
+    </view>
+
+    <view class="card glass-card mt-24" wx:if="{{isCook}}">
+      <view class="card-title fw-700 fs-28">📢 发布公告</view>
+      <textarea class="announce-input mt-16" placeholder="例如：今晚加班，我们点外卖吧…" value="{{announceText}}" bindinput="onAnnounceInput" />
+      <button class="btn btn-primary mt-16" style="border:none;" bindtap="postAnnounce">发布</button>
+    </view>
+  </block>
+
+  <view class="safe-bottom"></view>
+</view>

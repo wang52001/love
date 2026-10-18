@@ -1,0 +1,153 @@
+<view class="container">
+  <view class="bill-header">
+    <view class="bill-emoji animate-float">💰</view>
+    <view class="page-title">恋爱账单</view>
+    <view class="page-sub mt-8">一起记账，一起存钱</view>
+  </view>
+
+  <view class="total-card glass-card mt-32">
+    <view class="total-label muted fs-24">本月总支出</view>
+    <view class="total-value mt-12">
+      <text class="total-unit">¥</text>
+      <text class="total-num gradient-text">{{stats.total || '0.00'}}</text>
+    </view>
+    <view class="total-count muted fs-22 mt-8">共 {{stats.count || 0}} 笔</view>
+  </view>
+
+  <view class="section-title mt-40 mb-16">📊 支出分类</view>
+  <view class="cat-row">
+    <view class="cat-card glass-card" wx:for="{{categories}}" wx:key="key">
+      <view class="cat-emoji">{{item.emoji}}</view>
+      <view class="cat-name fs-22">{{item.name}}</view>
+      <view class="cat-money fw-700 fs-28">¥{{item.amount || '0.00'}}</view>
+    </view>
+  </view>
+
+  <view class="section-title mt-40 mb-16">✨ AI 消费建议</view>
+  <view class="advice-card glass-card">
+    <view class="advice-loading" wx:if="{{adviceLoading}}">
+      <view class="ai-loader-dot"></view>
+      <view class="ai-loader-dot"></view>
+      <view class="ai-loader-dot"></view>
+      <text class="muted fs-24 mt-12">AI 正在分析…</text>
+    </view>
+    <block wx:else>
+      <view class="advice-badge">🤖 AI 建议</view>
+      <view class="advice-text mt-12">{{advice}}</view>
+    </block>
+  </view>
+
+  <view class="section-title mt-40 mb-16">💝 共同心愿基金</view>
+  <view class="fund-card glass-card">
+    <block wx:if="{{fund}}">
+      <view class="fund-header row-between">
+        <view class="fund-name fw-700 fs-30">{{fund.name}}</view>
+        <view class="fund-edit muted fs-22" bindtap="openFundModal">编辑</view>
+      </view>
+      <view class="fund-progress-bg mt-20">
+        <view class="fund-progress-fill" style="width: {{fund.progressPct}}%;"></view>
+      </view>
+      <view class="fund-nums mt-16">
+        <text class="fund-saved fw-800 fs-32">¥{{fund.saved_amount || '0.00'}}</text>
+        <text class="muted fs-24">/ ¥{{fund.target_amount || '0.00'}}</text>
+      </view>
+      <view class="fund-deadline muted fs-22 mt-8" wx:if="{{fund.deadline}}">目标日期：{{fund.deadline}}</view>
+    </block>
+    <view wx:else class="fund-empty">
+      <text class="fund-empty-emoji">🌟</text>
+      <text class="muted fs-24 mt-12">还没有共同目标，设一个一起努力吧</text>
+      <view class="btn btn-primary mt-24" bindtap="openFundModal">设置心愿基金</view>
+    </view>
+  </view>
+
+  <view class="section-title mt-40 mb-16">📝 账单明细</view>
+  <view class="bill-list" wx:if="{{list.length}}">
+    <view class="bill-item glass-card" wx:for="{{list}}" wx:key="id">
+      <view class="bill-left">
+        <view class="bill-cat-emoji">{{item.cat_emoji}}</view>
+        <view class="bill-info">
+          <view class="bill-note fw-600 fs-28">{{item.note || '一笔支出'}}</view>
+          <view class="bill-meta muted fs-20 mt-4">{{item.bill_date}} · {{item.user_name || 'TA'}}</view>
+        </view>
+      </view>
+      <view class="bill-right">
+        <text class="bill-amount fw-700 fs-30">-¥{{item.amount}}</text>
+        <text class="bill-del muted fs-20" bindtap="deleteBill" data-id="{{item.id}}">删除</text>
+      </view>
+    </view>
+  </view>
+  <view wx:else class="empty-card glass-card mt-24">
+    <text class="empty-emoji">📝</text>
+    <text class="empty-tip muted fs-24 mt-12">本月还没有记账，记一笔吧</text>
+  </view>
+
+  <view class="fab" bindtap="openBillModal">
+    <text class="fab-icon">＋</text>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showBillModal}}" bindtap="closeBillModal"></view>
+  <view class="modal-content {{showBillModal ? 'show' : ''}}" wx:if="{{showBillModal}}">
+    <view class="modal-title">记一笔</view>
+    <view class="form-row mt-24">
+      <text class="form-label">金额</text>
+      <input class="form-input" type="digit" placeholder="0.00" value="{{billForm.amount}}" bindinput="onAmountInput" />
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">分类</text>
+      <view class="cat-select">
+        <view
+          class="cat-chip {{billForm.category === item.key ? 'active' : ''}}"
+          wx:for="{{categoryList}}"
+          wx:key="key"
+          bindtap="selectCategory"
+          data-key="{{item.key}}"
+        >
+          {{item.emoji}} {{item.name}}
+        </view>
+      </view>
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">备注</text>
+      <input class="form-input" placeholder="吃了顿火锅…" value="{{billForm.note}}" bindinput="onNoteInput" />
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">日期</text>
+      <picker mode="date" value="{{billForm.bill_date}}" bindchange="onDateChange">
+        <view class="form-picker">{{billForm.bill_date}}</view>
+      </picker>
+    </view>
+    <view class="modal-actions mt-32">
+      <view class="btn btn-outline flex-1" bindtap="closeBillModal">取消</view>
+      <view class="btn btn-primary flex-1" bindtap="saveBill">保存</view>
+    </view>
+  </view>
+
+  <view class="modal-mask" wx:if="{{showFundModal}}" bindtap="closeFundModal"></view>
+  <view class="modal-content {{showFundModal ? 'show' : ''}}" wx:if="{{showFundModal}}">
+    <view class="modal-title">心愿基金</view>
+    <view class="form-row mt-24">
+      <text class="form-label">目标名称</text>
+      <input class="form-input" placeholder="一起去云南旅行" value="{{fundForm.name}}" bindinput="onFundNameInput" />
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">目标金额</text>
+      <input class="form-input" type="digit" placeholder="5000" value="{{fundForm.target_amount}}" bindinput="onFundTargetInput" />
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">已存金额</text>
+      <input class="form-input" type="digit" placeholder="0" value="{{fundForm.saved_amount}}" bindinput="onFundSavedInput" />
+    </view>
+    <view class="form-row mt-20">
+      <text class="form-label">目标日期（选填）</text>
+      <picker mode="date" value="{{fundForm.deadline}}" bindchange="onFundDateChange">
+        <view class="form-picker">{{fundForm.deadline || '请选择'}}</view>
+      </picker>
+    </view>
+    <view class="modal-actions mt-32">
+      <view class="btn btn-outline flex-1" bindtap="closeFundModal">取消</view>
+      <view class="btn btn-primary flex-1" bindtap="saveFund">保存</view>
+    </view>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>

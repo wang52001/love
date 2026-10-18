@@ -1,0 +1,15 @@
+{
+  "name": "xiaoqihou-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "小气候 - 情侣私人天气台 · Cloudflare Worker + D1 + KV 后端",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "init-db": "wrangler d1 execute xiaoqihou-db --remote --file=./src/schema.sql",
+    "init-db-local": "wrangler d1 execute xiaoqihou-db --local --file=./src/schema.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^3.72.0"
+  }
+}

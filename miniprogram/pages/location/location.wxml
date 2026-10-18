@@ -1,0 +1,96 @@
+<view class="container">
+  <view class="head mt-40">
+    <view class="page-title">TA 在哪里</view>
+    <view class="page-sub mt-8">距你 {{distance}} · {{updated}}</view>
+  </view>
+
+  <view class="map-wrap mt-32 glass-card">
+    <map
+      wx:if="{{showMap}}"
+      id="coupleMap"
+      class="map-real"
+      latitude="{{mapLatitude}}"
+      longitude="{{mapLongitude}}"
+      scale="{{mapScale}}"
+      markers="{{markers}}"
+      polyline="{{polyline}}"
+      show-location="{{false}}"
+      enable-zoom="{{true}}"
+      enable-scroll="{{true}}"
+      enable-rotate="{{false}}"
+    />
+    <view wx:else class="map-real map-empty">
+      <view class="empty-tip">暂无位置数据</view>
+    </view>
+  </view>
+
+  <view class="loc-action mt-32">
+    <view class="btn btn-locate" bindtap="updateMyLocation">
+      <text class="locate-emoji">📍</text>
+      <text>更新我的位置</text>
+    </view>
+    <view class="locate-tip muted fs-22 mt-12 text-center">点击自动获取当前位置，TA 的地图会同步更新</view>
+  </view>
+
+  <view class="info-cards mt-32">
+    <view class="info-card glass-card p-24">
+      <view class="info-row row-between">
+        <view class="info-left">
+          <view class="info-icon me">💜</view>
+          <view class="info-text-wrap">
+            <view class="info-label muted fs-22">我的位置</view>
+            <view class="info-address fw-600 fs-26 mt-4">{{myLoc}}</view>
+          </view>
+        </view>
+        <view class="city-tag tag tag-lavender">{{myCity || '未设置'}}</view>
+      </view>
+    </view>
+    <view class="info-card glass-card p-24 mt-16">
+      <view class="info-row row-between">
+        <view class="info-left">
+          <view class="info-icon ta">💗</view>
+          <view class="info-text-wrap">
+            <view class="info-label muted fs-22">TA 的位置</view>
+            <view class="info-address fw-600 fs-26 mt-4">{{taLoc}}</view>
+          </view>
+        </view>
+        <view class="city-tag tag tag-rose" wx:if="{{taCity}}">{{taCity}}</view>
+        <view class="city-tag tag tag-gray" wx:else>已隐藏</view>
+      </view>
+    </view>
+    <view class="info-card glass-card p-24 mt-16">
+      <view class="info-row row-between">
+        <view class="info-left">
+          <view class="info-icon">📏</view>
+          <view class="info-text-wrap">
+            <view class="info-label muted fs-22">直线距离</view>
+            <view class="info-address fw-700 fs-26 gradient-text mt-4">{{distance}}</view>
+          </view>
+        </view>
+        <view class="muted fs-22">{{isSameCity ? '同城' : '异地'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="settings mt-40">
+    <view class="section-title mb-16">📍 我的位置</view>
+    <view class="set-card glass-card p-28">
+      <view class="set-row row-between">
+        <view>
+          <view class="set-title fw-600 fs-28">对 TA 可见我的位置</view>
+          <view class="set-desc muted fs-22 mt-6">关闭后 TA 只能看到"你隐藏了位置"</view>
+        </view>
+        <view class="switch {{visible ? 'on' : ''}}" bindtap="toggleVisible">
+          <view class="switch-thumb"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="cta-wrap mt-48 mb-32">
+    <view class="btn btn-primary" bindtap="goHome">
+      🌤️ 查看今天的共同天气
+    </view>
+  </view>
+  <view class="safe-bottom"></view>
+</view>

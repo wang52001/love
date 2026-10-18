@@ -1,0 +1,159 @@
+.container {
+  padding: 0 40rpx 60rpx;
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+}
+.page-title {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: #2B2438;
+}
+.page-sub {
+  font-size: 26rpx;
+}
+
+.loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.loading-emoji {
+  font-size: 96rpx;
+}
+
+/* 当前天气 */
+.current-card {
+  display: flex;
+  align-items: center;
+  padding: 40rpx;
+  background: linear-gradient(135deg, #FFD27A 0%, #FF8FAB 100%);
+}
+.current-main {
+  display: flex;
+  align-items: center;
+  margin-right: 32rpx;
+}
+.current-emoji {
+  font-size: 80rpx;
+  margin-right: 16rpx;
+}
+.current-temp {
+  font-size: 72rpx;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+.current-meta {
+  flex: 1;
+}
+.current-desc {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+.current-sub {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 8rpx;
+}
+
+/* 公共 */
+.section-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2B2438;
+}
+
+/* 24 小时 */
+.hour-scroll {
+  width: 100%;
+}
+.hour-list {
+  display: flex;
+  padding: 4rpx 0 20rpx;
+}
+.hour-item {
+  flex-shrink: 0;
+  width: 130rpx;
+  padding: 24rpx 0;
+  margin-right: 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.hour-time {
+  font-size: 24rpx;
+  color: #8B7A88;
+  margin-bottom: 12rpx;
+}
+.hour-emoji {
+  font-size: 44rpx;
+  margin-bottom: 12rpx;
+}
+.hour-temp {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #2B2438;
+}
+
+/* 7 天 */
+.day-list {
+  padding: 8rpx 0;
+}
+.day-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 28rpx;
+  border-bottom: 1rpx solid rgba(240, 232, 234, 0.8);
+}
+.day-item:last-child {
+  border-bottom: none;
+}
+.day-today {
+  background: rgba(255, 143, 171, 0.08);
+}
+.day-left {
+  width: 120rpx;
+}
+.day-weekday {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #2B2438;
+}
+.day-date {
+  font-size: 22rpx;
+  margin-top: 4rpx;
+}
+.day-emoji {
+  font-size: 44rpx;
+  width: 80rpx;
+  text-align: center;
+}
+.day-weather {
+  flex: 1;
+  font-size: 26rpx;
+  color: #5D5168;
+}
+.day-temps {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 160rpx;
+}
+.day-max {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #2B2438;
+}
+.day-min {
+  font-size: 24rpx;
+  margin-left: 8rpx;
+}
+
+.safe-bottom {
+  height: 60rpx;
+}

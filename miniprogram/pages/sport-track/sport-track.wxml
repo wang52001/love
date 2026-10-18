@@ -1,0 +1,54 @@
+<view class="container track-page">
+  <view class="track-top">
+    <view class="track-type">{{typeEmoji}} {{typeName}}</view>
+    <view class="track-timer">{{formatDuration}}</view>
+    <view class="track-status {{isTracking ? 'tracking' : ''}}">{{isTracking ? '正在记录轨迹...' : '已暂停'}}</view>
+  </view>
+
+  <view class="track-stats">
+    <view class="stat-box">
+      <view class="stat-num">{{distance.toFixed(2)}}</view>
+      <view class="stat-unit">公里</view>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-box">
+      <view class="stat-num">{{speed}}</view>
+      <view class="stat-unit">公里/小时</view>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-box">
+      <view class="stat-num">{{points.length}}</view>
+      <view class="stat-unit">轨迹点</view>
+    </view>
+  </view>
+
+  <view class="map-wrap glass-card">
+    <map
+      id="sportMap"
+      class="sport-map"
+      latitude="{{centerLat}}"
+      longitude="{{centerLng}}"
+      scale="16"
+      polyline="{{polyline}}"
+      markers="{{markers}}"
+      show-location="true"
+      enable-zoom="true"
+      enable-scroll="true"
+    ></map>
+    <view class="map-hint">
+      <text class="hint-dot"></text>
+      <text class="hint-text">锁屏或切至其他应用时，运动仍会继续记录轨迹</text>
+    </view>
+  </view>
+
+  <view class="track-controls">
+    <view wx:if="{{!isTracking && elapsed === 0}}" class="btn btn-primary btn-track" bindtap="startTrack">开始运动</view>
+    <view wx:elif="{{isTracking}}" class="btn btn-warn btn-track" bindtap="pauseTrack">暂停</view>
+    <view wx:else class="btn btn-primary btn-track" bindtap="resumeTrack">继续</view>
+    <view class="btn btn-outline btn-track {{isTracking ? 'disabled' : ''}}" bindtap="finishTrack">结束运动</view>
+  </view>
+
+  <view class="track-tips muted fs-22">
+    <text>提示：请保持小程序在前台或授权后台定位，以确保轨迹完整</text>
+  </view>
+</view>

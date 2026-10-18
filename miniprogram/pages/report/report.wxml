@@ -1,0 +1,120 @@
+<view class="container">
+  <view class="cover glass-card mt-48" style="background: linear-gradient(155deg, #B8A9FF 0%, #FF8FAB 100%);">
+    <view class="cover-glow"></view>
+    <view class="cover-inner">
+      <view class="cover-badge">{{periodLabel}}</view>
+      <view class="cover-title">{{year}}年{{month}}月 气候报告</view>
+      <view class="cover-sub">在一起第 {{togetherDays}} 天</view>
+    </view>
+  </view>
+
+  <view class="temp-card glass-card mt-40">
+    <view class="temp-label muted fs-24">本月平均气温</view>
+    <view class="temp-value">
+      <text class="temp-num gradient-text">{{avgTemp}}</text>
+      <text class="temp-unit">°C</text>
+    </view>
+    <view class="temp-tag tag tag-rose mt-12">偏暖 · 关系状态良好 🌤️</view>
+  </view>
+
+  <view class="section-title mt-48 mb-16">📊 本月心情分布</view>
+  <view class="dist-grid">
+    <view class="dist-item glass-card" wx:for="{{dist}}" wx:key="key">
+      <view class="dist-orb" style="background: linear-gradient(135deg, {{item.colors[0]}}, {{item.colors[1]}});">
+        {{item.emoji}}
+      </view>
+      <view class="dist-info">
+        <view class="dist-name fw-600 fs-26">{{item.name}}</view>
+        <view class="dist-bar mt-8">
+          <view class="dist-bar-fill" style="width: {{item.pct}}%; background: linear-gradient(90deg, {{item.colors[0]}}, {{item.colors[1]}});"></view>
+        </view>
+      </view>
+      <view class="dist-count gradient-text fw-800 fs-32">{{item.count}}</view>
+    </view>
+  </view>
+
+  <view class="section-title mt-48 mb-16">🔥 连续记录</view>
+  <view class="streak-row">
+    <view class="streak-card glass-card sun">
+      <view class="streak-emoji">☀️</view>
+      <view class="streak-num sun-text">{{streaks.sun}}</view>
+      <view class="streak-label">最长连晴</view>
+    </view>
+    <view class="streak-card glass-card rain">
+      <view class="streak-emoji">🌧️</view>
+      <view class="streak-num rain-text">{{streaks.rain}}</view>
+      <view class="streak-label">最长连雨</view>
+    </view>
+    <view class="streak-card glass-card rainbow">
+      <view class="streak-emoji">🌈</view>
+      <view class="streak-num rainbow-text">{{streaks.wish}}</view>
+      <view class="streak-label">心愿成真</view>
+    </view>
+  </view>
+
+  <view class="section-title mt-48 mb-16">📋 气候分析师笔记</view>
+  <view class="analyst glass-card p-32">
+    <view class="analyst-header row gap-16 mb-20">
+      <view class="analyst-avatar">🦉</view>
+      <view>
+        <view class="analyst-name fw-700">情侣心情录 · 分析师</view>
+        <view class="analyst-role muted fs-22">你们的专属关系观察员</view>
+      </view>
+    </view>
+    <view class="analyst-content fs-28">
+      <view class="analyst-para">{{analyst.p1}}</view>
+      <view class="analyst-para mt-16">{{analyst.p2}}</view>
+      <view class="analyst-para mt-16">{{analyst.p3}}</view>
+    </view>
+  </view>
+
+  <view class="section-title mt-48 mb-16">✨ AI 情感洞察</view>
+  <view class="ai-insight-card glass-card">
+    <view class="ai-insight-stats" wx:if="{{aiInsightStats && !aiInsightLoading}}">
+      <view class="ai-stat-item">
+        <view class="ai-stat-num gradient-text">{{aiInsightStats.sync_rate === null ? '—' : aiInsightStats.sync_rate + '%'}}</view>
+        <view class="ai-stat-label muted fs-22">心情同步率</view>
+      </view>
+      <view class="ai-stat-divider"></view>
+      <view class="ai-stat-item">
+        <view class="ai-stat-num sun-text">{{aiInsightStats.both_days}}</view>
+        <view class="ai-stat-label muted fs-22">共同记录</view>
+      </view>
+      <view class="ai-stat-divider"></view>
+      <view class="ai-stat-item">
+        <view class="ai-stat-num rain-text">{{aiInsightStats.my_bad_days + aiInsightStats.ta_bad_days}}</view>
+        <view class="ai-stat-label muted fs-22">消极天数</view>
+      </view>
+    </view>
+
+    <view class="ai-insight-loading" wx:if="{{aiInsightLoading}}">
+      <view class="ai-loader-dot"></view>
+      <view class="ai-loader-dot"></view>
+      <view class="ai-loader-dot"></view>
+      <text class="muted fs-24" style="margin-left:16rpx;">AI 正在分析你们的最近一周…</text>
+    </view>
+    <block wx:elif="{{aiInsight}}">
+      <view class="ai-insight-header">
+        <text class="ai-insight-badge">🤖 AI 洞察</text>
+        <text class="ai-insight-refresh muted fs-22" bindtap="refreshAIInsight">换一篇 ›</text>
+      </view>
+      <view class="ai-insight-text">{{aiInsight}}</view>
+      <view class="ai-insight-foot muted fs-20">—— 基于最近 7 天心情数据生成</view>
+    </block>
+    <view wx:else class="ai-insight-empty">
+      <text class="ai-insight-emoji">💫</text>
+      <text class="ai-insight-tip muted fs-24">{{aiInsightTip || 'AI 暂未生成洞察，点这里重试 ↻'}}</text>
+      <view class="ai-insight-retry-btn" wx:if="{{aiInsightTip}}" bindtap="refreshAIInsight">重新生成</view>
+    </view>
+  </view>
+
+  <view class="cta-wrap mt-48 mb-48">
+    <view class="btn btn-primary" bindtap="goShare">
+      📤 生成报告卡片
+    </view>
+    <view class="btn btn-outline mt-20" bindtap="goHome">
+      返回气象站
+    </view>
+  </view>
+  <view class="safe-bottom"></view>
+</view>

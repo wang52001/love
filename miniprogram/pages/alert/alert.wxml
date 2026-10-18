@@ -1,0 +1,125 @@
+<view class="container">
+  <view class="hero rainy-hero mt-48 glass-card" wx:if="{{alert}}">
+    <view class="hero-bg"></view>
+    <view class="hero-inner">
+      <view class="hero-emoji animate-float">{{alert.emoji}}</view>
+      <view class="hero-badge tag tag-rose mt-16">{{alert.levelLabel}}</view>
+      <view class="hero-title mt-16">{{alert.title}}</view>
+      <view class="hero-desc mt-12">{{alert.desc}}</view>
+    </view>
+  </view>
+  <view class="hero empty-hero mt-48 glass-card" wx:else>
+    <view class="hero-bg"></view>
+    <view class="hero-inner">
+      <view class="hero-emoji animate-float">💫</view>
+      <view class="hero-badge tag tag-lavender mt-16">暂无预警</view>
+      <view class="hero-title mt-16">还没有添加提醒</view>
+      <view class="hero-desc mt-12">点下面按钮，把你们的纪念日、生日都记下来吧 💕</view>
+    </view>
+  </view>
+
+  <view class="stats mt-40" wx:if="{{list.length}}">
+    <view class="stat-card glass-card">
+      <view class="stat-num gradient-text">{{list.length}}</view>
+      <view class="stat-label">提醒总数</view>
+    </view>
+    <view class="stat-card glass-card">
+      <view class="stat-num sun-text">{{urgentCount || 0}}</view>
+      <view class="stat-label">3天内预警</view>
+    </view>
+    <view class="stat-card glass-card">
+      <view class="stat-num rainbow-text">{{yearlyCount || list.length}}</view>
+      <view class="stat-label">年度庆典</view>
+    </view>
+  </view>
+
+  <view class="tips-wrap mt-40">
+    <view class="section-title mb-20">💡 使用小贴士</view>
+    <view class="tips glass-card p-32">
+      <view class="tip-item" wx:for="{{tips}}" wx:key="title">
+        <view class="tip-num gradient-text fw-800">{{index + 1}}</view>
+        <view class="tip-content">
+          <view class="tip-title fw-600 fs-28">{{item.title}}</view>
+          <view class="tip-desc muted fs-24 mt-8">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-title mt-48 mb-20">📅 所有提醒</view>
+  <view class="list-wrap">
+    <view class="alert-row glass-card p-24" wx:for="{{list}}" wx:key="id" bindtap="del" data-id="{{item.id}}">
+      <view class="row-left">
+        <view class="al-orb {{item.days_left <= 0 ? 'today' : (item.days_left <= 3 ? 'urgent' : (item.days_left <= 7 ? 'soon' : ''))}}">
+          <text class="al-emoji">{{item.days_left <= 0 ? '🎉' : (item.days_left <= 3 ? '⚠️' : '📅')}}</text>
+        </view>
+        <view class="al-body">
+          <view class="al-title fw-700 fs-28">{{item.title}}</view>
+          <view class="al-meta muted fs-22 mt-6">
+            <text wx:if="{{item.type}}" class="al-type">{{item.type}}</text>
+            <text wx:if="{{item.date}}"> · {{item.date}}</text>
+          </view>
+          <view class="al-note muted fs-22 mt-8" wx:if="{{item.note}}">"{{item.note}}"</view>
+        </view>
+      </view>
+      <view class="row-right">
+        <view class="al-days {{item.days_left <= 0 ? 'today' : (item.days_left <= 3 ? 'urgent' : '')}}">
+          <text class="days-num gradient-text fw-900">{{item.days_left <= 0 ? '今' : item.days_left}}</text>
+          <text class="days-unit muted fs-20">{{item.days_left <= 0 ? '' : '天'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="cta-wrap mt-48">
+    <view class="btn btn-primary" bindtap="toggleForm" wx:if="{{!showForm}}">
+      ➕ 添加新提醒
+    </view>
+    <view class="btn btn-ghost-lavender" wx:else bindtap="toggleForm">
+      ✕ 取消添加
+    </view>
+  </view>
+
+  <view class="form-panel glass-card p-32 mt-32" wx:if="{{showForm}}">
+    <view class="section-title mb-20">📝 新增提醒</view>
+
+    <view class="form-row mb-24">
+      <view class="form-label muted fs-24 mb-10">标题（如：恋爱纪念日、TA 的生日）</view>
+      <input class="field" placeholder="例如：恋爱 1000 天" value="{{form.title}}" data-field="title" bindinput="onFormInput" maxlength="30" />
+    </view>
+
+    <view class="form-row mb-24">
+      <view class="form-label muted fs-24 mb-10">类型</view>
+      <picker mode="selector" range="{{types}}" bindchange="pickType" value="{{0}}">
+        <view class="field picker-field row-between">
+          <text>{{form.type}}</text>
+          <text class="muted">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-row mb-24">
+      <view class="form-label muted fs-24 mb-10">日期</view>
+      <picker mode="date" value="{{form.date}}" bindchange="pickDate" start="2020-01-01">
+        <view class="field picker-field row-between">
+          <text wx:if="{{form.date}}">{{form.date}}</text>
+          <text wx:else class="muted">请选择日期 ›</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-row mb-24">
+      <view class="form-label muted fs-24 mb-10">备注（选填，30字内）</view>
+      <textarea class="textarea" placeholder="例如：记得买樱花味蛋糕 🌸" maxlength="30" value="{{form.note}}" data-field="note" bindinput="onFormInput" auto-height></textarea>
+    </view>
+
+    <view class="btn btn-primary mt-16" bindtap="submit">
+      💾 保存提醒
+    </view>
+  </view>
+
+  <view class="btn btn-ghost mt-32 mb-48" bindtap="goCalendar">
+    📅 回看气候日历
+  </view>
+  <view class="safe-bottom"></view>
+</view>

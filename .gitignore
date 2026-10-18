@@ -1,0 +1,10 @@
+deploy-secrets.txt
+project.private.config.json
+.env*
+.dev.vars
+.workbuddy/
+.uploads/
+.trae-html-share-packages/
+node_modules/
+.wrangler/
+.DS_Store

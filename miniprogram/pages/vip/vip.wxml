@@ -1,0 +1,92 @@
+<view class="container">
+  <view class="vip-top mt-48">
+    <view class="vip-title fw-900 fs-44">心动会员</view>
+    <view class="vip-sub mt-8">让爱更闪耀 · 支持我们持续更新 💕</view>
+  </view>
+
+  <block wx:if="{{!isLogin}}">
+    <view class="empty-state">
+      <text class="empty-emoji">💎</text>
+      <view class="empty-text">登录后即可开通心动会员</view>
+      <button class="btn btn-wx mt-32" style="border:none;" bindtap="goLogin">去登录</button>
+    </view>
+  </block>
+
+  <block wx:else>
+    <!-- 会员状态卡 -->
+    <view class="vip-hero mt-32">
+      <view class="vip-hero-deco deco-1"></view>
+      <view class="vip-hero-deco deco-2"></view>
+      <view class="vip-hero-inner">
+        <view class="vip-badge-circle animate-float">💎</view>
+        <view class="vip-hero-name fw-800 fs-36 mt-16" wx:if="{{isVip}}">心动会员生效中</view>
+        <view class="vip-hero-name fw-800 fs-36 mt-16" wx:else>未开通会员</view>
+        <view class="vip-hero-desc fs-24 mt-8" wx:if="{{isVip}}">有效期至 {{expiresLabel}} · 还剩 {{daysLeft}} 天</view>
+        <view class="vip-hero-desc fs-24 mt-8" wx:else>开通后解锁专属会员徽章与更多甜蜜特权</view>
+      </view>
+    </view>
+
+    <!-- 会员特权 -->
+    <view class="section-title mt-48 mb-16">✨ 会员特权</view>
+    <view class="glass-card p-32">
+      <view class="perk-item" wx:for="{{perks}}" wx:key="id">
+        <view class="perk-icon">{{item.emoji}}</view>
+        <view class="flex-1">
+          <view class="fw-700 fs-26">{{item.title}}</view>
+          <view class="muted fs-22 mt-4">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 选择套餐 -->
+    <view class="section-title mt-48 mb-16">💎 选择套餐</view>
+    <view class="tier-row">
+      <view
+        class="tier-card {{item.tier === 'quarterly' ? 'tier-best' : ''}}"
+        wx:for="{{tiers}}"
+        wx:key="tier"
+        bindtap="onBuy"
+        data-tier="{{item.tier}}">
+        <view class="tier-best-tag" wx:if="{{item.tier === 'quarterly'}}">最受欢迎</view>
+        <view class="tier-emoji">{{item.emoji}}</view>
+        <view class="tier-name fw-700 fs-28 mt-8">{{item.name}}</view>
+        <view class="tier-price fw-900 mt-8">¥{{item.price}}</view>
+        <view class="tier-tagline mt-4">{{item.tagline}}</view>
+        <view class="tier-buy-btn mt-16">{{isVip ? '续费' : '开通'}}</view>
+      </view>
+    </view>
+    <view class="mode-hint mt-16" wx:if="{{mode === 'sandbox'}}">
+      🛠 当前为沙盒模式：点击套餐 → 模拟支付确认后免费开通，不会真实扣款
+    </view>
+    <view class="mode-hint mt-16" wx:else>
+      💳 已接入微信虚拟支付（Android 微信支付 / iOS Apple 支付），点击套餐拉起支付
+    </view>
+
+    <!-- 购买记录 -->
+    <view class="section-title mt-48 mb-16">🧾 购买记录</view>
+    <view class="glass-card p-32" wx:if="{{orders.length}}">
+      <view class="order-item" wx:for="{{orders}}" wx:key="out_trade_no">
+        <view class="flex-1">
+          <view class="fw-600 fs-26">{{item.title}}</view>
+          <view class="muted fs-20 mt-4">{{item.dateLabel}}</view>
+        </view>
+        <view class="order-right">
+          <view class="fw-700 fs-26">¥{{item.price}}</view>
+          <view class="order-status fs-20 mt-4 {{item.statusPaid ? 'order-paid' : ''}}">{{item.statusLabel}}</view>
+        </view>
+      </view>
+    </view>
+    <view class="glass-card p-32" wx:else>
+      <view class="empty-text text-center muted fs-24">还没有购买记录～</view>
+    </view>
+
+    <!-- 说明 -->
+    <view class="glass-card p-32 mt-40 mb-24">
+      <view class="fw-700 fs-26">📢 说明</view>
+      <view class="note-line muted fs-22 mt-12">· 会员权益为虚拟服务，一经开通不支持退款</view>
+      <view class="note-line muted fs-22 mt-8">· iOS 端要求 iOS 15+ 且微信 8.0.68+，最低支付金额 1 元</view>
+      <view class="note-line muted fs-22 mt-8">· 支付遇到问题？公众号「情侣心情录」联系我们</view>
+    </view>
+    <view class="safe-bottom"></view>
+  </block>
+</view>

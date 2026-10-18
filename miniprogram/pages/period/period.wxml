@@ -1,0 +1,295 @@
+<view class="container">
+  <view class="page-header">
+    <view class="page-title">生理周期</view>
+    <view class="page-sub mt-8">四阶段追踪 · 伴侣贴心关怀</view>
+  </view>
+
+  <image class="period-hero-img" src="/images/period-hero.jpg" mode="widthFix" lazy-load></image>
+
+  <!-- 性别选择 -->
+  <view class="gender-card glass-card mt-32" wx:if="{{gender === 0}}">
+    <view class="gender-deco deco-a"></view>
+    <view class="gender-deco deco-b"></view>
+    <view class="gender-emoji">🌷</view>
+    <view class="gender-title fw-800 fs-32">先告诉我你是？</view>
+    <view class="gender-desc muted fs-24 mt-12">女生记录经期看四阶段分析，男生查看伴侣状态并送关怀</view>
+    <view class="gender-actions mt-40">
+      <view class="gender-pick {{gender === 2 ? 'on' : ''}}" bindtap="setGender" data-g="2">
+        <view class="gp-emoji">👩</view>
+        <view class="gp-label fw-700 fs-26">我是女生</view>
+        <view class="gp-sub muted fs-20">记录 · 分析</view>
+      </view>
+      <view class="gender-pick {{gender === 1 ? 'on' : ''}}" bindtap="setGender" data-g="1">
+        <view class="gp-emoji">👨</view>
+        <view class="gp-label fw-700 fs-26">我是男生</view>
+        <view class="gp-sub muted fs-20">关心 · 陪伴</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- ============ 女生视角 ============ -->
+  <block wx:if="{{gender === 2}}">
+    <!-- 当前阶段大卡 -->
+    <view class="hero-card mt-32" wx:if="{{status.hasData && phaseInfo}}" style="background: linear-gradient(135deg, {{phaseInfo.bgColor}}, #FFFFFF);">
+      <view class="hero-deco deco-1"></view>
+      <view class="hero-deco deco-2"></view>
+      <view class="hero-top">
+        <view class="hero-emoji">{{phaseInfo.emoji}}</view>
+        <view class="hero-meta">
+          <view class="hero-phase fw-800 fs-40" style="color: {{phaseInfo.color}};">{{phaseInfo.label}}</view>
+          <view class="hero-sub muted fs-24 mt-4">第 {{status.dayOfPhase || 1}} 天 · 周期第 {{timeline.dayOfCycle || 1}} 天</view>
+        </view>
+      </view>
+      <view class="hero-desc fs-26 mt-24">{{phaseInfo.desc}}</view>
+      <view class="hero-flags mt-24">
+        <view class="flag-chip" wx:if="{{status.inPeriod}}" style="background: {{phaseInfo.color}};">
+          <text class="flag-text">经期中</text>
+        </view>
+        <view class="flag-chip flag-next" wx:if="{{status.daysUntilNext > 0}}">
+          <text class="flag-text" style="color: {{phaseInfo.color}};">距下次月经 {{status.daysUntilNext}} 天</text>
+        </view>
+        <view class="flag-chip flag-next" wx:if="{{status.ovulationDay}}">
+          <text class="flag-text" style="color: #9B8AFF;">排卵日 {{status.ovulationDay}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 无数据引导 -->
+    <view class="empty-hero glass-card mt-32" wx:if="{{!status.hasData}}">
+      <view class="eh-emoji">🌸</view>
+      <view class="eh-title fw-700 fs-30">还没有周期记录</view>
+      <view class="eh-desc muted fs-24 mt-12">记录一次经期开始日期，就能看到完整的四阶段分析和贴心建议</view>
+      <button class="btn btn-primary mt-32" style="border:none;" bindtap="startPeriod">今天是月经第一天</button>
+    </view>
+
+    <!-- 四阶段时间轴 -->
+    <view class="card glass-card mt-24" wx:if="{{timeline}}">
+      <view class="card-head row-between">
+        <view class="card-title fw-700 fs-28">📅 周期时间轴</view>
+        <view class="card-tag muted fs-22">{{timeline.cycle}} 天</view>
+      </view>
+      <!-- 时间轴条 -->
+      <view class="tl-bar mt-24">
+        <view class="tl-seg" wx:for="{{timeline.segs}}" wx:key="key" style="flex: {{item.percent}}; background: {{item.active ? item.color : item.bg}};">
+          <text class="tl-emoji">{{item.emoji}}</text>
+        </view>
+        <!-- 进度指针 -->
+        <view class="tl-pointer" style="left: {{timeline.progressPercent}}%;">
+          <view class="tl-pointer-dot"></view>
+          <view class="tl-pointer-line"></view>
+        </view>
+      </view>
+      <!-- 阶段说明 -->
+      <view class="tl-legend mt-20">
+        <view class="tl-leg-item" wx:for="{{timeline.segs}}" wx:key="key">
+          <view class="tl-leg-dot" style="background: {{item.color}};"></view>
+          <view class="tl-leg-body">
+            <view class="tl-leg-row">
+              <view class="tl-leg-label fs-22 {{item.active ? 'fw-700' : 'muted'}}" style="color: {{item.active ? item.color : ''}};">{{item.label}}</view>
+              <view class="tl-leg-days muted fs-20">{{item.days}}天</view>
+            </view>
+            <view class="tl-leg-date muted fs-20">{{item.dateRange}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="tl-foot muted fs-22 mt-20">
+        周期开始：{{timeline.periodStart}} · 预计下次：{{timeline.nextPeriodStart || '-'}}
+      </view>
+    </view>
+
+    <!-- 阶段护理建议 -->
+    <view class="card glass-card mt-24" wx:if="{{phaseInfo}}">
+      <view class="card-title fw-700 fs-28">{{phaseInfo.emoji}} 这段时间可以这样照顾自己</view>
+      <view class="tip-list mt-20">
+        <view class="tip-item" wx:for="{{selfTips}}" wx:key="*this">
+          <view class="tip-dot" style="background: {{phaseInfo.color}};"></view>
+          <view class="tip-text fs-26">{{item}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 快速记录 -->
+    <view class="card glass-card mt-24" wx:if="{{status.hasData}}">
+      <view class="card-title fw-700 fs-28">⚡ 快速记录</view>
+      <view class="record-row mt-20">
+        <button class="btn {{status.inPeriod ? 'btn-outline' : 'btn-primary'}} flex-1" style="border:none;" bindtap="startPeriod">{{status.inPeriod ? '标记经期已结束' : '姨妈来了'}}</button>
+      </view>
+      <view class="record-hint muted fs-22 mt-12">{{status.inPeriod ? '点击按钮结束本次经期记录' : '点击按钮记录今天为经期开始'}}</view>
+    </view>
+
+    <!-- AI 身体分析 -->
+    <view class="card glass-card mt-24" wx:if="{{status.hasData}}">
+      <view class="card-head row-between">
+        <view class="card-title fw-700 fs-28">🤖 AI 贴心分析</view>
+        <view class="refresh-btn fs-22" bindtap="analyze" wx:if="{{!aiLoading}}">换一段</view>
+      </view>
+      <view class="ai-body mt-20" wx:if="{{aiText}}">
+        <view class="ai-text fs-26">{{aiText}}</view>
+      </view>
+      <view class="ai-empty mt-20" wx:else>
+        <view class="muted fs-24">{{aiLoading ? 'AI 正在为你分析…' : '点击下方按钮，AI 给你一段温暖的身体分析'}}</view>
+        <button class="btn btn-outline mt-20" style="border:none;" bindtap="analyze" wx:if="{{!aiLoading}}">立即分析</button>
+      </view>
+    </view>
+
+    <!-- 伴侣关怀（女生收到） -->
+    <view class="card glass-card mt-24" wx:if="{{status.hasData}}">
+      <view class="card-head row-between">
+        <view class="card-title fw-700 fs-28">💕 来自 TA 的关怀</view>
+        <view class="card-tag muted fs-22">{{careHistory.length || 0}}</view>
+      </view>
+      <view class="care-list mt-20" wx:if="{{careHistory.length}}">
+        <view class="care-item" wx:for="{{careHistory}}" wx:key="id">
+          <view class="care-emoji">{{item.action_emoji}}</view>
+          <view class="care-body">
+            <view class="care-label fw-600 fs-26">{{item.action_label}}</view>
+            <view class="care-msg muted fs-22 mt-4">{{item.action_msg}}</view>
+          </view>
+          <view class="care-time muted-light fs-20">{{item.created_at}}</view>
+        </view>
+      </view>
+      <view class="empty-tip muted fs-24 mt-20" wx:else>还没有收到 TA 的关怀哦</view>
+    </view>
+
+    <!-- 周期设置 -->
+    <view class="card glass-card mt-24">
+      <view class="card-title fw-700 fs-28">⚙️ 周期设置</view>
+      <view class="form-row mt-24">
+        <text class="form-label fs-26">周期长度</text>
+        <input class="form-input" type="digit" value="{{settings.cycle_length}}" bindinput="onCycleInput" />
+        <text class="unit fs-24">天</text>
+      </view>
+      <view class="form-row mt-16">
+        <text class="form-label fs-26">经期长度</text>
+        <input class="form-input" type="digit" value="{{settings.period_length}}" bindinput="onPeriodLenInput" />
+        <text class="unit fs-24">天</text>
+      </view>
+      <view class="form-hint muted fs-22 mt-12">周期 21-45 天，经期 2-10 天</view>
+      <button class="btn btn-primary mt-24" style="border:none;" bindtap="saveSettings">保存设置</button>
+    </view>
+
+    <!-- 历史记录 -->
+    <view class="card glass-card mt-24" wx:if="{{records.length}}">
+      <view class="card-head row-between">
+        <view class="card-title fw-700 fs-28">📜 历史记录</view>
+        <view class="card-tag muted fs-22">{{records.length}}</view>
+      </view>
+      <view class="rec-list mt-20">
+        <view class="rec-item" wx:for="{{records}}" wx:key="id">
+          <view class="rec-dot"></view>
+          <view class="rec-body">
+            <view class="rec-date fs-26">{{item.start_date}}<text wx:if="{{item.end_date}}"> ~ {{item.end_date}}</text><text wx:else class="muted"> 至今</text></view>
+            <view class="rec-note muted fs-22 mt-4" wx:if="{{item.note}}">{{item.note}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- ============ 男生视角 ============ -->
+  <block wx:if="{{gender === 1}}">
+    <!-- 伴侣状态卡 -->
+    <view class="hero-card mt-32" wx:if="{{partnerStatus.hasData && partnerPhaseInfo}}" style="background: linear-gradient(135deg, {{partnerPhaseInfo.bgColor}}, #FFFFFF);">
+      <view class="hero-deco deco-1"></view>
+      <view class="hero-deco deco-2"></view>
+      <view class="hero-top">
+        <view class="hero-emoji">{{partnerPhaseInfo.emoji}}</view>
+        <view class="hero-meta">
+          <view class="hero-phase fw-800 fs-40" style="color: {{partnerPhaseInfo.color}};">TA 在{{partnerPhaseInfo.label}}</view>
+          <view class="hero-sub muted fs-24 mt-4">第 {{partnerStatus.dayOfPhase || 1}} 天 · 多关心一下 TA 💕</view>
+        </view>
+      </view>
+      <view class="hero-desc fs-26 mt-24">{{partnerPhaseInfo.desc}}</view>
+      <view class="hero-flags mt-24">
+        <view class="flag-chip" wx:if="{{partnerStatus.inPeriod}}" style="background: {{partnerPhaseInfo.color}};">
+          <text class="flag-text">经期中</text>
+        </view>
+        <view class="flag-chip flag-next" wx:if="{{partnerStatus.daysUntilNext > 0}}">
+          <text class="flag-text" style="color: {{partnerPhaseInfo.color}};">距下次月经 {{partnerStatus.daysUntilNext}} 天</text>
+        </view>
+        <view class="flag-chip flag-next" wx:if="{{partnerStatus.ovulationDay}}">
+          <text class="flag-text" style="color: #9B8AFF;">排卵日 {{partnerStatus.ovulationDay}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 伴侣无数据 -->
+    <view class="empty-hero glass-card mt-32" wx:if="{{!partnerStatus.hasData}}">
+      <view class="eh-emoji">🌷</view>
+      <view class="eh-title fw-700 fs-30">TA 还没有记录周期</view>
+      <view class="eh-desc muted fs-24 mt-12">{{partnerStatus.tip || '等 TA 记录经期后，你就能看到状态并送关怀啦'}}</view>
+    </view>
+
+    <!-- 伴侣周期时间轴 -->
+    <view class="card glass-card mt-24" wx:if="{{partnerTimeline}}">
+      <view class="card-head row-between">
+        <view class="card-title fw-700 fs-28">📅 TA 的周期时间轴</view>
+        <view class="card-tag muted fs-22">{{partnerTimeline.cycle}} 天</view>
+      </view>
+      <view class="tl-bar mt-24">
+        <view class="tl-seg" wx:for="{{partnerTimeline.segs}}" wx:key="key" style="flex: {{item.percent}}; background: {{item.active ? item.color : item.bg}};">
+          <text class="tl-emoji">{{item.emoji}}</text>
+        </view>
+        <view class="tl-pointer" style="left: {{partnerTimeline.progressPercent}}%;">
+          <view class="tl-pointer-dot"></view>
+          <view class="tl-pointer-line"></view>
+        </view>
+      </view>
+      <view class="tl-legend mt-20">
+        <view class="tl-leg-item" wx:for="{{partnerTimeline.segs}}" wx:key="key">
+          <view class="tl-leg-dot" style="background: {{item.color}};"></view>
+          <view class="tl-leg-body">
+            <view class="tl-leg-row">
+              <view class="tl-leg-label fs-22 {{item.active ? 'fw-700' : 'muted'}}" style="color: {{item.active ? item.color : ''}};">{{item.label}}</view>
+              <view class="tl-leg-days muted fs-20">{{item.days}}天</view>
+            </view>
+            <view class="tl-leg-date muted fs-20">{{item.dateRange}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 关怀建议 -->
+    <view class="card glass-card mt-24" wx:if="{{partnerPhaseInfo}}">
+      <view class="card-title fw-700 fs-28">💡 现在可以这样关心 TA</view>
+      <view class="tip-list mt-20">
+        <view class="tip-item" wx:for="{{partnerTips}}" wx:key="*this">
+          <view class="tip-dot" style="background: {{partnerPhaseInfo.color}};"></view>
+          <view class="tip-text fs-26">{{item}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 关怀动作 -->
+    <view class="card glass-card mt-24" wx:if="{{partnerStatus.hasData}}">
+      <view class="card-title fw-700 fs-28">💕 送一份关怀给 TA</view>
+      <view class="care-grid mt-24">
+        <view class="care-cell {{sendingKey === item.key ? 'sending' : ''}}" wx:for="{{careActions}}" wx:key="key" bindtap="sendCare" data-key="{{item.key}}">
+          <view class="cc-emoji">{{item.emoji}}</view>
+          <view class="cc-label fs-24 fw-600">{{item.label}}</view>
+          <view class="cc-sending fs-20" wx:if="{{sendingKey === item.key}}">发送中…</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 关怀记录 -->
+    <view class="card glass-card mt-24" wx:if="{{careHistory.length}}">
+      <view class="card-head row-between">
+        <view class="card-title fw-700 fs-28">关怀记录</view>
+        <view class="card-tag muted fs-22">{{careHistory.length}}</view>
+      </view>
+      <view class="care-list mt-20">
+        <view class="care-item" wx:for="{{careHistory}}" wx:key="id">
+          <view class="care-emoji">{{item.action_emoji}}</view>
+          <view class="care-body">
+            <view class="care-label fw-600 fs-26">{{item.action_label}}</view>
+            <view class="care-msg muted fs-22 mt-4">{{item.action_msg}}</view>
+          </view>
+          <view class="care-time muted-light fs-20">{{item.created_at}}</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="safe-bottom"></view>
+</view>

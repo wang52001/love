@@ -1,0 +1,188 @@
+<view class="container">
+  <view class="timer-header">
+    <view class="timer-emoji animate-float">⏱️</view>
+    <view class="page-title">情侣专注计时</view>
+    <view class="page-sub mt-8">独自专注 或 邀请TA一起 · 记录每一段时间</view>
+  </view>
+
+  <!-- 双人邀请 -->
+  <view class="pending-section" wx:if="{{pendingList.length}}">
+    <view class="section-title-sm mt-32 mb-12">📨 TA邀请你一起</view>
+    <view class="pending-item glass-card" wx:for="{{pendingList}}" wx:key="id">
+      <view class="pending-emoji">{{item.category_emoji}}</view>
+      <view class="pending-body flex-1">
+        <view class="fw-700 fs-28">{{item.host_name}} 邀你一起 {{item.category_name}}</view>
+        <view class="muted fs-22 mt-4">{{item.timer_date}}</view>
+      </view>
+      <view class="btn btn-primary btn-sm" bindtap="joinSession" data-session="{{item.session_id}}">加入</view>
+    </view>
+  </view>
+
+  <!-- 计时器主卡片 -->
+  <view class="timer-main glass-card mt-32">
+    <view class="timer-mode-tag" wx:if="{{isRunning}}">
+      <text class="tag {{timerMode === 'together' ? 'tag-lavender' : 'tag-rose'}}">
+        {{timerMode === 'together' ? '💕 一起计时' : '👤 独自计时'}} · {{selectedCategoryName}}
+      </text>
+    </view>
+    <view class="timer-display {{isRunning ? 'active' : ''}}">
+      <text class="timer-time {{isRunning ? 'gradient-text' : 'muted'}}">{{isRunning ? displayTime : '00:00:00'}}</text>
+    </view>
+    <view class="timer-cat-label muted fs-24" wx:if="{{isRunning}}">
+      {{isPaused ? '已暂停' : '计时中…'}}
+    </view>
+
+    <view class="timer-actions mt-32" wx:if="{{!isRunning}}">
+      <view class="btn btn-primary btn-block" bindtap="openStartModal">
+        <text>▶ 开始计时</text>
+      </view>
+    </view>
+
+    <view class="timer-actions row mt-32" wx:if="{{isRunning}}">
+      <view class="btn btn-outline flex-1" bindtap="{{isPaused ? 'resumeTimer' : 'pauseTimer'}}">
+        <text>{{isPaused ? '继续' : '暂停'}}</text>
+      </view>
+      <view class="btn btn-primary flex-1" bindtap="openFinishModal">
+        <text>结束</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 本周统计 -->
+  <view class="stats-card glass-card mt-32">
+    <view class="row row-between">
+      <view class="section-title-sm">📊 本周统计</view>
+      <text class="muted fs-22">{{stats.week_start}} ~ {{stats.week_end}}</text>
+    </view>
+    <view class="stats-grid mt-20">
+      <view class="stats-item">
+        <view class="stats-num gradient-text fw-900">{{stats.summary.total_count || 0}}</view>
+        <view class="stats-label muted fs-22 mt-6">总次数</view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <view class="stats-num sun-text fw-900">{{stats.summary.my_count || 0}}</view>
+        <view class="stats-label muted fs-22 mt-6">我的次数</view>
+      </view>
+      <view class="stats-divider"></view>
+      <view class="stats-item">
+        <view class="stats-num rainbow-text fw-900">{{stats.summary.together_count || 0}}</view>
+        <view class="stats-label muted fs-22 mt-6">一起次数</view>
+      </view>
+    </view>
+
+    <!-- 柱状图 -->
+    <view class="chart-title mt-32 muted fs-22">每日时长（分钟）</view>
+    <view class="bar-chart mt-16">
+      <view class="bar-col" wx:for="{{stats.weekly}}" wx:key="date">
+        <view class="bar-wrap">
+          <view class="bar-fill" style="height: {{maxDaily > 0 ? (item.total / maxDaily * 100) : 0}}%;"></view>
+        </view>
+        <view class="bar-value fs-20 {{item.total > 0 ? '' : 'muted'}}">{{item.total > 0 ? item.minutes : ''}}</view>
+        <view class="bar-label muted fs-20">{{item.day}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类占比 -->
+  <view class="cat-card glass-card mt-24" wx:if="{{stats.categories.length}}">
+    <view class="section-title-sm">🎨 分类占比</view>
+    <view class="cat-list mt-20">
+      <view class="cat-item" wx:for="{{stats.categories}}" wx:key="category">
+        <view class="cat-info row row-center">
+          <text class="cat-emoji">{{item.emoji}}</text>
+          <text class="cat-name fw-600 fs-26">{{item.name}}</text>
+          <text class="muted fs-22 ml-auto">{{item.pct}}%</text>
+        </view>
+        <view class="cat-bar-bg mt-8">
+          <view class="cat-bar-fill" style="width: {{item.pct}}%;"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史记录 -->
+  <view class="section-title mt-40 mb-16">📅 计时记录</view>
+  <view class="history-list" wx:if="{{historyList.length}}">
+    <view class="history-item glass-card" wx:for="{{historyList}}" wx:key="id">
+      <view class="history-left">
+        <view class="history-emoji">{{item.category_emoji}}</view>
+        <view class="history-body flex-1">
+          <view class="row row-center">
+            <text class="fw-700 fs-28">{{item.category_name}}</text>
+            <text class="tag {{item.mode === 'together' ? 'tag-lavender' : 'tag-gray'}} ml-12">{{item.mode === 'together' ? '💕 一起' : '独自'}}</text>
+          </view>
+          <view class="muted fs-22 mt-4">{{item.timer_date}} · {{item.is_mine ? '我' : item.user_name}}</view>
+          <view class="history-duration gradient-text fw-800 fs-32 mt-8">{{item.format_duration}}</view>
+          <view class="muted fs-22 mt-4" wx:if="{{item.note}}">💭 {{item.note}}</view>
+        </view>
+      </view>
+      <view class="history-del muted fs-22" catchtap="deleteRecord" data-id="{{item.id}}">删除</view>
+    </view>
+  </view>
+  <view wx:else class="empty-card glass-card mt-24">
+    <text class="empty-emoji">⏳</text>
+    <text class="empty-tip muted fs-24 mt-12">还没有计时记录，开始第一次专注吧</text>
+  </view>
+
+  <view class="safe-bottom"></view>
+
+  <!-- 开始计时弹窗 -->
+  <view class="modal-mask" wx:if="{{showStartModal}}" bindtap="closeStartModal"></view>
+  <view class="modal-content {{showStartModal ? 'show' : ''}}" wx:if="{{showStartModal}}">
+    <view class="modal-title">开始计时</view>
+
+    <view class="form-row mt-32">
+      <text class="form-label">模式</text>
+      <view class="mode-select">
+        <view class="mode-chip {{startMode === 'single' ? 'active' : ''}}" bindtap="selectStartMode" data-mode="single">
+          <text class="mode-emoji">👤</text>
+          <text class="mode-name">独自计时</text>
+        </view>
+        <view class="mode-chip {{startMode === 'together' ? 'active' : ''}}" bindtap="selectStartMode" data-mode="together">
+          <text class="mode-emoji">💕</text>
+          <text class="mode-name">邀请TA一起</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-row mt-24">
+      <text class="form-label">分类</text>
+      <view class="cat-select">
+        <view class="cat-chip {{startCategory === item.key ? 'active' : ''}}" wx:for="{{categories}}" wx:key="key" bindtap="selectStartCategory" data-key="{{item.key}}">
+          <text class="cat-chip-emoji">{{item.emoji}}</text>
+          <text class="cat-chip-name">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-row mt-20" wx:if="{{startCategory === 'custom'}}">
+      <text class="form-label">名称</text>
+      <input class="form-input" placeholder="写一个分类名（如：练琴、画画）" maxlength="10" value="{{startCustomName}}" bindinput="onCustomNameInput" />
+    </view>
+
+    <view class="modal-tip mt-24 muted fs-22" wx:if="{{startMode === 'together'}}">
+      💡 邀请发起后，TA打开此页面会看到邀请，点击「加入」即可同步开始计时
+    </view>
+
+    <view class="modal-actions mt-40">
+      <view class="btn btn-outline flex-1" bindtap="closeStartModal">取消</view>
+      <view class="btn btn-primary flex-1" bindtap="confirmStart">开始</view>
+    </view>
+  </view>
+
+  <!-- 结束确认弹窗 -->
+  <view class="modal-mask" wx:if="{{showFinishModal}}" bindtap="closeFinishModal"></view>
+  <view class="modal-content {{showFinishModal ? 'show' : ''}}" wx:if="{{showFinishModal}}">
+    <view class="modal-title">结束计时</view>
+    <view class="finish-time gradient-text fw-900 mt-24">{{displayTime}}</view>
+    <view class="form-row mt-24">
+      <text class="form-label">备注（选填）</text>
+      <input class="form-input" placeholder="此刻的感受…" value="{{finishNote}}" bindinput="onNoteInput" />
+    </view>
+    <view class="modal-actions mt-32">
+      <view class="btn btn-outline flex-1" bindtap="giveUpTimer">放弃</view>
+      <view class="btn btn-primary flex-1" bindtap="confirmFinish">保存</view>
+    </view>
+  </view>
+</view>

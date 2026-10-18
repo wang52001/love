@@ -1,0 +1,48 @@
+name = "xiaoqihou-api"
+main = "src/index.js"
+compatibility_date = "2024-09-01"
+compatibility_flags = [ "nodejs_compat" ]
+workers_dev = true
+
+routes = [
+  { pattern = "api.jdhsf.top/*", zone_name = "jdhsf.top" }
+]
+
+[vars]
+WECHAT_APPID = "wxa35a4a7feac8ab7b"
+JWT_SECRET = "REDACTED"
+ADMIN_PASS = "REDACTED"
+# 订阅消息模板 ID（从微信公众平台申请后填入，也可通过管理员接口动态配置）
+# SUBSCRIBE_TPL_ALERT = ""
+# SUBSCRIBE_TPL_REPORT = ""
+# SUBSCRIBE_TPL_GREETING = ""
+
+# ============ 心动会员 · 虚拟支付（个人主体 · 道具直购） ============
+# 开通：MP后台【支付与交易-虚拟支付】→ 开通后在【基本配置】拿 OfferID / 现网AppKey
+# 留空 = 沙盒模式（模拟支付，不产生真实扣款）；填齐 OfferID+AppKey = 真实虚拟支付
+XPAY_OFFER_ID = "1450679550"
+XPAY_APP_KEY = "REDACTED"
+# 道具配置：MP后台【虚拟支付-道具管理】创建道具并发布后，把道具ID和价格(单位:分)填进来
+# 例：月卡道具 vip_month 价格600分(6元)、季卡 vip_quarter 1600分(16元)、年卡 vip_year 4800分(48元)
+XPAY_GOODS_JSON = '{"monthly":{"productId":"vip_month","price":600},"quarterly":{"productId":"vip_quarter","price":1600},"yearly":{"productId":"vip_year","price":4800}}'
+# MP后台【开发管理-消息推送】Token（模式选「明文」，URL 填 https://api.jdhsf.top/wechat/notify）
+# 用于验证微信发货推送（xpay_goods_deliver_notify）来源，防止伪造发货请求
+MP_PUSH_TOKEN = "REDACTED"
+
+# [env.production.vars]
+# WECHAT_APPID = "production-appid"
+# JWT_SECRET = "prod-long-long-secret-xxxxxxxxxxxx"
+# ADMIN_PASS = "prod-admin-password"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "xiaoqihou-db"
+database_id = "cabc357a-bf1a-4128-9187-905a372da03a"
+
+[[kv_namespaces]]
+binding = "KV"
+id = "8725ce42f3c34ae196bb47a99ed8190f"
+
+# 生成报告/预警/心愿比对的定时任务（每天 00:05 UTC+8 即 16:05 UTC）
+[triggers]
+crons = [ "5 16 * * *" ]

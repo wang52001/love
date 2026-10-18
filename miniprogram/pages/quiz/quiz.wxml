@@ -1,0 +1,113 @@
+<view class="container">
+  <view class="quiz-header">
+    <view class="quiz-emoji animate-float">🎯</view>
+    <view class="page-title">默契挑战</view>
+    <view class="page-sub mt-8">每天 3 道题，看看你们有多懂彼此</view>
+  </view>
+
+  <block wx:if="{{loading}}">
+    <view class="loading-card glass-card mt-40">
+      <view class="ai-loader-dot"></view>
+      <view class="ai-loader-dot"></view>
+      <view class="ai-loader-dot"></view>
+      <text class="muted fs-24 mt-16">AI 正在出题…</text>
+    </view>
+  </block>
+
+  <block wx:elif="{{finished}}">
+    <view class="result-card glass-card mt-32">
+      <view class="result-ring" style="background: conic-gradient(#FF8FAB {{score}}%, #F0E8EA {{score}}%);">
+        <view class="result-inner">
+          <text class="result-score">{{score}}</text>
+          <text class="result-unit">%</text>
+        </view>
+      </view>
+      <view class="result-label mt-16">今日默契度</view>
+      <view class="result-comment mt-24">{{comment}}</view>
+    </view>
+
+    <view class="section-title mt-40 mb-16">答案对比</view>
+    <view class="compare-list">
+      <view class="compare-card glass-card" wx:for="{{result}}" wx:key="id">
+        <view class="compare-question">{{item.question}}</view>
+        <view class="compare-row">
+          <view class="compare-side {{item.match ? 'match' : ''}}">
+            <text class="compare-tag">我</text>
+            <text class="compare-answer">{{item.my_answer || '未答'}}</text>
+          </view>
+          <view class="compare-vs">{{item.match ? '✓' : '×'}}</view>
+          <view class="compare-side {{item.match ? 'match' : ''}}">
+            <text class="compare-tag">TA</text>
+            <text class="compare-answer">{{item.ta_answer || '未答'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="btn btn-primary mt-40" bindtap="goHistory">查看历史挑战</view>
+    <view class="btn btn-outline mt-20" bindtap="goBack">返回我的</view>
+  </block>
+
+  <block wx:elif="{{needWait}}">
+    <view class="wait-card glass-card mt-48">
+      <view class="wait-emoji">⏳</view>
+      <view class="wait-title fw-700 fs-30">已提交，等 TA 答完</view>
+      <view class="wait-tip muted fs-24 mt-12">你们今天都答完后，才能看到默契度和 AI 点评哦</view>
+      <view class="btn btn-primary mt-32" bindtap="loadToday">刷新状态</view>
+    </view>
+  </block>
+
+  <block wx:elif="{{questions.length}}">
+    <view class="progress-bar mt-24">
+      <view class="progress-fill" style="width: {{((answeredCount + (currentAnswer ? 1 : 0)) / questions.length) * 100}}%;"></view>
+    </view>
+
+    <view class="question-card glass-card mt-24">
+      <view class="question-num">第 {{currentIndex + 1}} / {{questions.length}} 题</view>
+      <view class="question-text">{{currentQuestion.question}}</view>
+      <view class="option-list">
+        <view
+          class="option-item {{currentAnswer === item ? 'selected' : ''}}"
+          wx:for="{{currentQuestion.options}}"
+          wx:key="*this"
+          bindtap="selectOption"
+          data-value="{{item}}"
+        >
+          <text class="option-letter">{{['A','B'][index]}}</text>
+          <text class="option-text">{{item}}</text>
+        </view>
+      </view>
+
+      <view class="custom-option mt-24">
+        <view class="custom-toggle {{customMode ? 'active' : ''}}" bindtap="toggleCustom">
+          <text class="custom-dot {{customMode ? 'checked' : ''}}"></text>
+          <text class="custom-label">以上都不是，我想自定义答案</text>
+        </view>
+        <view class="custom-input-wrap" wx:if="{{customMode}}">
+          <input
+            class="custom-input"
+            placeholder="输入你的真实想法…"
+            value="{{customAnswer}}"
+            bindinput="onCustomInput"
+            maxlength="30"
+          />
+        </view>
+      </view>
+    </view>
+
+    <view class="nav-row mt-32">
+      <view class="nav-btn {{currentIndex > 0 ? '' : 'disabled'}}" bindtap="prevQuestion">上一题</view>
+      <view class="nav-btn nav-next {{currentAnswer ? '' : 'disabled'}}" bindtap="nextQuestion">{{isLast ? '提交' : '下一题'}}</view>
+    </view>
+  </block>
+
+  <block wx:elif="{{tip}}">
+    <view class="empty-card glass-card mt-48">
+      <text class="empty-emoji">💫</text>
+      <text class="empty-tip muted fs-26 mt-16">{{tip}}</text>
+      <view class="btn btn-primary mt-32" bindtap="goBack">返回我的</view>
+    </view>
+  </block>
+
+  <view class="safe-bottom"></view>
+</view>

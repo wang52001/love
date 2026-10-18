@@ -1,0 +1,20 @@
+<view class="tabbar-wrap">
+  <view class="tabbar-blur"></view>
+  <view class="tabbar-inner">
+    <view
+      class="tab-item {{selected === idx ? 'active' : ''}}"
+      wx:for="{{list}}"
+      wx:for-index="idx"
+      wx:key="pagePath"
+      bindtap="switchTab"
+      data-idx="{{idx}}"
+      data-path="{{item.pagePath}}"
+    >
+      <view class="tab-orb">
+        <text class="tab-emoji">{{item.emoji}}</text>
+        <view class="tab-dot" wx:if="{{selected === idx}}"></view>
+      </view>
+      <text class="tab-text">{{item.text}}</text>
+    </view>
+  </view>
+</view>

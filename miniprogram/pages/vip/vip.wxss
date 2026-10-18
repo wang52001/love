@@ -1,0 +1,199 @@
+/* ========== 心动会员页 ========== */
+.vip-top {
+  padding-left: 4rpx;
+}
+.vip-title {
+  color: #FF8FAB;
+  letter-spacing: 2rpx;
+}
+.vip-sub {
+  font-size: 26rpx;
+  color: #A094AC;
+  margin-top: 8rpx;
+  font-weight: 500;
+}
+
+/* 会员状态卡：玫瑰粉 → 薰衣草紫渐变 */
+.vip-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 32rpx;
+  padding: 48rpx 32rpx 40rpx;
+  background: linear-gradient(135deg, #FF8FAB 0%, #B8A9FF 100%);
+  box-shadow: 0 16rpx 48rpx rgba(184, 169, 255, 0.28);
+  text-align: center;
+}
+.vip-hero-deco {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+.vip-hero-deco.deco-1 {
+  top: -60rpx;
+  right: -50rpx;
+  width: 240rpx;
+  height: 240rpx;
+}
+.vip-hero-deco.deco-2 {
+  bottom: -70rpx;
+  left: -50rpx;
+  width: 220rpx;
+  height: 220rpx;
+  opacity: 0.6;
+}
+.vip-hero-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.vip-badge-circle {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72rpx;
+  box-shadow: 0 10rpx 30rpx rgba(139, 58, 98, 0.25);
+}
+.vip-hero-name {
+  color: #FFFFFF;
+}
+.vip-hero-desc {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* 特权列表 */
+.perk-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+}
+.perk-icon {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 28rpx;
+  background: linear-gradient(135deg, #FFE8EE, #EEE9FF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+/* 套餐三列卡 */
+.tier-row {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+.tier-card {
+  position: relative;
+  flex: 1;
+  margin-right: 20rpx;
+  padding: 32rpx 12rpx 28rpx;
+  border-radius: 28rpx;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF8FA 100%);
+  border: 2rpx solid #F0E8EA;
+  box-shadow: 0 8rpx 24rpx rgba(139, 119, 149, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  overflow: visible;
+}
+.tier-card:last-child {
+  margin-right: 0;
+}
+.tier-card:active {
+  transform: scale(0.97);
+}
+.tier-best {
+  border-color: #FF8FAB;
+  background: linear-gradient(180deg, #FFF0F5 0%, #FFF8FA 100%);
+  box-shadow: 0 12rpx 36rpx rgba(255, 143, 171, 0.22);
+}
+.tier-best-tag {
+  position: absolute;
+  top: -18rpx;
+  left: 50%;
+  margin-left: -70rpx;
+  width: 140rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #FF8FAB, #FF6B8E);
+  color: #FFFFFF;
+  font-size: 20rpx;
+  font-weight: 700;
+  box-shadow: 0 6rpx 16rpx rgba(255, 107, 142, 0.35);
+}
+.tier-emoji {
+  font-size: 56rpx;
+}
+.tier-name {
+  color: #2B2438;
+}
+.tier-price {
+  font-size: 48rpx;
+  color: #FF6B8E;
+}
+.tier-tagline {
+  font-size: 20rpx;
+  color: #A094AC;
+}
+.tier-buy-btn {
+  width: 100%;
+  padding: 14rpx 0;
+  border-radius: 999rpx;
+  background: #FFE8EE;
+  color: #FF6B8E;
+  font-size: 24rpx;
+  font-weight: 700;
+}
+.tier-best .tier-buy-btn {
+  background: linear-gradient(135deg, #FF8FAB, #B8A9FF);
+  color: #FFFFFF;
+  box-shadow: 0 8rpx 20rpx rgba(255, 143, 171, 0.35);
+}
+
+.mode-hint {
+  font-size: 22rpx;
+  color: #B5A8B8;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* 购买记录 */
+.order-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #F5EFF2;
+}
+.order-item:last-child {
+  border-bottom: none;
+}
+.order-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.order-status {
+  color: #B5A8B8;
+}
+.order-paid {
+  color: #FF8FAB;
+  font-weight: 600;
+}
+
+/* 说明 */
+.note-line {
+  line-height: 1.7;
+}

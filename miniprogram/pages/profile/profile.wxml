@@ -1,0 +1,307 @@
+<view class="container">
+  <block wx:if="{{!isLogin}}">
+    <view class="login-wrap">
+      <view class="brand-logo animate-float">🌤️</view>
+      <view class="brand-name gradient-text fw-900 fs-56 mt-24">情侣心情录</view>
+      <view class="brand-slogan muted fs-26 mt-12">我们俩的私人心情台</view>
+
+      <view class="login-hero glass-card mt-56">
+        <view class="hero-deco deco-1"></view>
+        <view class="hero-deco deco-2"></view>
+        <view class="hero-inner">
+          <view class="hero-tag tag tag-rose mb-16">🌸 情侣专属</view>
+          <view class="hero-title fw-800 fs-34 mb-16" style="white-space: pre-line;">把每一天的心情
+变成只属于你们的心情</view>
+          <view class="hero-desc muted fs-24">10秒记录心情 · 自动合成共同心情 · 心情日历留存回忆</view>
+        </view>
+      </view>
+
+      <view class="protocol-card mt-68">
+        <view class="protocol-title">📖 请先阅读并同意</view>
+        <view class="protocol-row" bindtap="toggleAgree">
+          <view class="checkbox {{agreeProtocol ? 'checked' : ''}}">
+            <text wx:if="{{agreeProtocol}}" class="check-mark">✓</text>
+          </view>
+          <view class="protocol-text muted fs-22">
+            <text>我已阅读并同意</text>
+            <text class="link link-pink" catchtap="openAgreement">《用户协议》</text>
+            <text>与</text>
+            <text class="link link-purple" catchtap="openPrivacy">《隐私政策》</text>
+          </view>
+        </view>
+        <view class="protocol-hint muted-light fs-20 mt-12">
+          💡 点击上方《用户协议》或《隐私政策》可先查看完整内容
+        </view>
+      </view>
+
+      <button class="btn btn-wx btn-login mt-40" bindtap="wxLogin" loading="{{loginLoading}}" disabled="{{loginLoading}}" style="border:none;">
+        <text class="wx-icon">💚</text>
+        <text>{{loginLoading ? '登录中…' : '微信一键登录'}}</text>
+      </button>
+      <view class="login-tip muted fs-20 mt-24 text-center">
+        ✨ 登录后可一键同步你的微信头像和昵称
+      </view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="auth-expired-banner mt-24" wx:if="{{_authFailed}}">
+      <text class="banner-emoji">⚠️</text>
+      <view class="banner-body flex-1">
+        <view class="banner-title fw-700 fs-24">登录已过期，需要重新微信登录</view>
+        <view class="banner-desc muted fs-20 mt-4">点右边按钮重新登录 💕</view>
+      </view>
+      <view class="banner-btn btn btn-wx btn-sm" bindtap="forceShowLogin">重新登录</view>
+    </view>
+    <view class="profile-top mt-48 row-between">
+      <view>
+        <view class="page-title">我的</view>
+        <view class="page-sub mt-8">管理你的情侣心情录</view>
+      </view>
+      <view class="msg-btn" bindtap="goAlert">
+        <text class="msg-emoji">🔔</text>
+        <view class="msg-dot" wx:if="{{hasAlert}}"></view>
+      </view>
+    </view>
+
+    <view class="profile-fixer-card glass-card mt-32" wx:if="{{needFixProfile}}">
+      <view class="fixer-card-deco fixer-deco-1"></view>
+      <view class="fixer-card-deco fixer-deco-2"></view>
+      <view class="fixer-card-deco fixer-deco-3"></view>
+      <view class="fixer-header row row-between row-center" bindtap="toggleFixer">
+        <view class="fixer-title-wrap">
+          <view class="fixer-tag">✨ 让我更认识你</view>
+          <view class="fixer-title fw-800 fs-28 mt-8">完善你的专属头像和昵称</view>
+          <view class="fixer-desc muted fs-20 mt-6">授权一次，主页、心情卡、祝福卡都会立刻换上 💕</view>
+        </view>
+        <view class="fixer-collapse">
+          <view class="fixer-arrow {{showFixer ? 'up' : ''}}"></view>
+        </view>
+      </view>
+      <view class="fixer-body" wx:if="{{showFixer}}">
+        <view class="fixer-divider"></view>
+        <view class="fixer-inner">
+          <view class="fixer-avatar-col">
+            <button class="fixer-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onFixAvatar">
+              <image wx:if="{{fixAvatar}}" src="{{fixAvatar}}" class="fixer-avatar-img" mode="aspectFill"></image>
+              <view wx:if="{{!fixAvatar}}" class="fixer-avatar-placeholder">
+                <view class="fixer-avatar-ring"></view>
+                <text class="fixer-avatar-ph">📷</text>
+              </view>
+              <view class="fixer-avatar-badge">💚</view>
+            </button>
+            <view class="fixer-avatar-label muted fs-20 mt-12">点我选微信头像</view>
+          </view>
+          <view class="fixer-nick-col">
+            <view class="fixer-nick-label fs-20 mb-10">
+              <text class="fixer-nick-icon">🪪</text>
+              昵称
+            </view>
+            <view class="fixer-nick-wrap">
+              <input class="fixer-nick-input" type="nickname" placeholder="点这里直接填入微信昵称～" bindblur="onFixNickBlur" bindinput="onFixNickInput" value="{{fixNick}}" />
+              <text class="fixer-nick-magic" wx:if="{{!fixNick}}">✨</text>
+            </view>
+            <view class="fixer-nick-hint muted fs-18 mt-10">之后也可以随时回来改哟～</view>
+          </view>
+        </view>
+        <view class="fixer-actions row mt-24">
+          <button class="btn btn-fixer-cancel flex-1" style="border:none;" bindtap="closeFixer">
+            <text>稍后再说</text>
+          </button>
+          <button class="btn btn-fixer-save flex-1" style="border:none;" bindtap="saveFixer" disabled="{{fixerSaving}}" loading="{{fixerSaving}}">
+            <text wx:if="{{!fixerSaving}}">💚 保存我的资料</text>
+            <text wx:else>保存中…</text>
+          </button>
+        </view>
+      </view>
+    </view>
+
+    <view class="user-card glass-card mt-32 p-32">
+      <view class="user-left row gap-20">
+        <view class="user-avatar" bindtap="onAvatarTap">
+          <image wx:if="{{userInfo.avatar_url}}" src="{{userInfo.avatar_url}}" class="avatar-img" mode="aspectFill" binderror="onAvatarError" data-side="my"></image>
+          <view wx:else class="avatar-fallback gradient-text fw-800">{{avatarChar}}</view>
+          <view class="avatar-edit-badge">📷</view>
+        </view>
+        <view class="user-info-block">
+          <view class="user-name fw-800 fs-32" bindtap="editProfile">{{userInfo.nickname || '情侣心情录用户'}}</view>
+          <view class="user-status mt-6" bindtap="goBind">
+            <text class="tag tag-sun fs-20" wx:if="{{vipIsVip}}">💎 会员 · 还剩 {{vipDaysLeft}} 天</text>
+            <text wx:if="{{coupleInfo && coupleInfo.bind_date}}" class="tag tag-rose fs-20">💕 已绑定 · 第 {{togetherDays}} 天</text>
+            <text wx:else class="tag tag-lavender fs-20">未绑定 · 点击邀请TA</text>
+          </view>
+        </view>
+      </view>
+      <view class="edit-btn muted fs-22" bindtap="editProfile" hover-class="edit-btn-hover">
+        <text class="edit-btn-icon">✏️</text>
+        <text>编辑</text>
+        <text class="edit-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="kpi-row mt-24">
+      <view class="kpi-card glass-card" bindtap="goCalendar">
+        <view class="kpi-num gradient-text fw-900 fs-40">{{kpi.days}}</view>
+        <view class="kpi-label muted fs-20 mt-6">累计打卡</view>
+      </view>
+      <view class="kpi-card glass-card" bindtap="goReport">
+        <view class="kpi-num sun-text fw-900 fs-40">{{kpi.sunny}}</view>
+        <view class="kpi-label muted fs-20 mt-6">开心次数</view>
+      </view>
+      <view class="kpi-card glass-card" bindtap="goWish">
+        <view class="kpi-num rainbow-text fw-900 fs-40">{{kpi.rainbow}}</view>
+        <view class="kpi-label muted fs-20 mt-6">心动次数</view>
+      </view>
+    </view>
+
+    <view class="vip-banner mt-24" bindtap="goVip">
+      <view class="vip-banner-deco deco-1"></view>
+      <view class="vip-banner-deco deco-2"></view>
+      <view class="vip-banner-left">
+        <text class="vip-banner-emoji">💎</text>
+        <view class="vip-banner-text">
+          <view class="vip-banner-title fw-800 fs-28">{{vipIsVip ? '心动会员生效中' : '开通心动会员'}}</view>
+          <view class="vip-banner-desc fs-20 mt-4">{{vipIsVip ? '还剩 ' + vipDaysLeft + ' 天 · 续费持续闪耀' : '专属会员徽章 · 更多甜蜜特权等你解锁'}}</view>
+        </view>
+      </view>
+      <view class="vip-banner-btn">{{vipIsVip ? '续费' : '去看看'}}</view>
+    </view>
+
+    <view class="section-title mt-48 mb-16">💕 情侣</view>
+    <view class="menu glass-card">
+      <view class="menu-item" bindtap="goBind" wx:if="{{!coupleInfo || !coupleInfo.bind_date}}">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #FF8FAB, #FFB3C6);">💌</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">邀请码绑定</view>
+          <view class="menu-desc muted fs-22 mt-4">生成邀请码 或 输入TA的邀请码</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+      <view class="menu-item" bindtap="goBind" wx:else>
+        <view class="menu-icon" style="background: linear-gradient(135deg, #FFD27A, #FFE8A8);">💍</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">情侣绑定管理</view>
+          <view class="menu-desc muted fs-22 mt-4">已绑定 · 解绑 / 查看邀请码</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+      <view class="menu-split"></view>
+      <view class="menu-item" bindtap="goQuiz">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #A8E6CF, #DCEDC8);">🎯</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">默契挑战</view>
+          <view class="menu-desc muted fs-22 mt-4">每日 3 题 · AI 点评 · 看看你们多默契</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+      <view class="menu-split"></view>
+      <view class="menu-item" bindtap="goBill">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #FFD93D, #FFF59D);">💰</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">恋爱账单</view>
+          <view class="menu-desc muted fs-22 mt-4">共同记账 · 心愿基金 · AI 消费建议</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+      <view class="menu-split"></view>
+      <view class="menu-item" bindtap="goSport">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #A8E6CF, #FFD93D);">🏃</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">一起运动</view>
+          <view class="menu-desc muted fs-22 mt-4">健康打卡 · 步数里程 · 共同目标</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+      <view class="menu-split"></view>
+      <view class="menu-item" bindtap="goTimer">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #B8A9FF, #FFB3C6);">⏱️</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">专注计时</view>
+          <view class="menu-desc muted fs-22 mt-4">独自专注 或 邀请TA一起 · 可视化统计</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+      <view class="menu-split"></view>
+      <view class="menu-item" bindtap="goPeriod">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #FFB6C1, #FFD6E4);">🌸</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">生理周期</view>
+          <view class="menu-desc muted fs-22 mt-4">经期记录 · 排卵期预测 · AI 身体分析</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+      <view class="menu-split"></view>
+      <view class="menu-item" bindtap="goCook">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #FFD27A, #FFA07A);">🍳</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">今天吃什么</view>
+          <view class="menu-desc muted fs-22 mt-4">做饭担当 · 点菜下单 · 公告通知</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+    </view>
+
+    <view class="section-title mt-40 mb-16">🎨 个性化</view>
+    <view class="menu glass-card">
+      <view class="menu-item" bindtap="goShareSet">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #87CEEB, #BEE3F5);">🎨</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">心情卡风格</view>
+          <view class="menu-desc muted fs-22 mt-4">暖阳 / 夜空 / 彩虹 / 薄雾 / 樱花 / 海蓝</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+      <view class="menu-split"></view>
+      <view class="menu-item" bindtap="goLocation">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #7393B3, #A8C5E6);">📍</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">定位可见性</view>
+          <view class="menu-desc muted fs-22 mt-4">{{locVisible ? '已开启 · TA能看到你' : '已关闭 · TA看不到你'}}</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+    </view>
+
+    <view class="section-title mt-40 mb-16">📄 其他</view>
+    <view class="menu glass-card">
+      <view class="menu-item" bindtap="openAgreement">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #FFD6A5, #FFE8CC);">📄</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">用户协议</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+      <view class="menu-split"></view>
+      <view class="menu-item" bindtap="openPrivacy">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #B8B8C8, #DEDEE8);">🔒</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">隐私政策</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+      <view class="menu-split"></view>
+      <view class="menu-item" bindtap="openAbout">
+        <view class="menu-icon" style="background: linear-gradient(135deg, #FF8FAB, #FFD6A5);">💡</view>
+        <view class="menu-body flex-1">
+          <view class="menu-name fw-600 fs-28">关于情侣心情录</view>
+          <view class="menu-desc muted fs-22 mt-4">v1.0.0</view>
+        </view>
+        <view class="menu-arrow muted fs-28">›</view>
+      </view>
+    </view>
+
+    <view class="btn btn-outline mt-48" bindtap="logout">
+      退出登录
+    </view>
+    <view class="force-login-card mt-32 mb-48 glass-card p-24" bindtap="forceShowLogin">
+      <view class="row row-between row-center">
+        <view>
+          <view class="fw-700 fs-26">💚 微信一键登录 / 切换账号</view>
+          <view class="muted fs-20 mt-4">不想手动退出？点这里立刻回到微信登录页</view>
+        </view>
+        <text class="fs-40 muted">›</text>
+      </view>
+    </view>
+    <view class="safe-bottom"></view>
+  </block>
+</view>

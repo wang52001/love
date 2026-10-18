@@ -1,0 +1,172 @@
+<view class="container">
+  <view class="top-bar mt-40 row-between">
+    <view>
+      <view class="page-title">今天的心情</view>
+      <view class="page-sub">{{dateStr}} · 花 10 秒，告诉 TA</view>
+    </view>
+    <view wx:if="{{streak > 0}}" class="streak-tag tag tag-rose">🔥 第 {{streak}} 天连续打卡</view>
+  </view>
+
+  <!-- 真实天气 -->
+  <view class="real-weather mt-24 glass-card" wx:if="{{realWeather}}">
+    <text class="rw-emoji">{{realWeather.weather_emoji}}</text>
+    <view class="rw-info">
+      <view class="rw-temp">{{realWeather.temperature}}°C</view>
+      <view class="rw-desc muted">{{realWeather.weather_desc}} · 湿度 {{realWeather.humidity}}% · 风速 {{realWeather.wind_speed}}km/h</view>
+    </view>
+  </view>
+
+  <view class="mood-hero mt-32 glass-card" wx:if="{{selected}}">
+    <view class="hero-orb" style="background: linear-gradient(155deg, {{selected.color1}} 0%, {{selected.color2}} 100%);">
+      <text class="hero-emoji animate-float">{{selected.emoji}}</text>
+    </view>
+    <view class="hero-label" style="color: {{selected.text}};">选了 · {{selected.name}}</view>
+    <view wx:if="{{submitted}}" class="tag tag-sun mt-16">✓ 今日已记录</view>
+  </view>
+  <view class="mood-hero mt-32 glass-card empty-hero" wx:else>
+    <view class="hero-orb-empty">
+      <text class="hero-emoji-placeholder">🌸</text>
+    </view>
+    <view class="hero-label muted">选一个最像今天的心情吧</view>
+  </view>
+
+  <view class="mood-grid mt-40">
+    <view
+      class="mood-opt glass-card {{selectedKey === item.key ? 'selected' : ''}}"
+      wx:for="{{moodList}}"
+      wx:key="key"
+      bindtap="selectMood"
+      data-key="{{item.key}}"
+    >
+      <view
+        class="mood-orb"
+        style="background: linear-gradient(155deg, {{item.color1}} 0%, {{item.color2}} 100%);"
+      >
+        <text class="mood-emoji">{{item.emoji}}</text>
+      </view>
+      <view class="mood-name" style="{{selectedKey === item.key ? ('color:' + item.text) : ''}}">{{item.name}}</view>
+      <view class="mood-tick" wx:if="{{selectedKey === item.key}}">✓</view>
+    </view>
+  </view>
+
+  <!-- 给 TA 打分 -->
+  <view class="rating-section mt-40 glass-card p-32">
+    <view class="section-title mb-16">⭐ 给 TA 今天的表现打分</view>
+    <view class="rating-stars">
+      <view
+        class="star {{taRating >= 1 ? 'star-active' : ''}}"
+        bindtap="onRatingTap"
+        data-r="1"
+      >⭐</view>
+      <view
+        class="star {{taRating >= 2 ? 'star-active' : ''}}"
+        bindtap="onRatingTap"
+        data-r="2"
+      >⭐</view>
+      <view
+        class="star {{taRating >= 3 ? 'star-active' : ''}}"
+        bindtap="onRatingTap"
+        data-r="3"
+      >⭐</view>
+      <view
+        class="star {{taRating >= 4 ? 'star-active' : ''}}"
+        bindtap="onRatingTap"
+        data-r="4"
+      >⭐</view>
+      <view
+        class="star {{taRating >= 5 ? 'star-active' : ''}}"
+        bindtap="onRatingTap"
+        data-r="5"
+      >⭐</view>
+    </view>
+    <view class="rating-text fs-24 mt-12 {{taRating > 0 ? 'rating-text-active' : 'muted'}}">{{taRatingText}}</view>
+    <view class="rating-from-ta mt-16" wx:if="{{taRatingForMe}}">
+      <text class="muted fs-22">TA 给你打了 </text>
+      <text class="fw-700" style="color:#FF8FAB;">{{taRatingForMe}}</text>
+      <text class="muted fs-22"> 颗星</text>
+    </view>
+  </view>
+
+  <view class="sliders mt-40 glass-card p-32">
+    <view class="section-title mb-24">🌡️ 今日体感温度 & 想念程度</view>
+
+    <view class="slider-row">
+      <view class="row-between mb-8">
+        <view class="fs-24 fw-600">温度</view>
+        <view class="fs-26 fw-700 gradient-text">{{tempVal}}°C</view>
+      </view>
+      <slider
+        min="0" max="40" step="1" value="{{tempVal}}"
+        block-size="24"
+        activeColor="#FF8FAB"
+        backgroundColor="rgba(255,143,171,0.18)"
+        bindchange="onTempChange"
+      />
+    </view>
+
+    <view class="slider-row mt-24">
+      <view class="row-between mb-8">
+        <view class="fs-24 fw-600">想念程度</view>
+        <view class="fs-26 fw-700" style="color:#7A6BD6;">{{visibility}}%</view>
+      </view>
+      <slider
+        min="0" max="100" step="5" value="{{visibility}}"
+        block-size="24"
+        activeColor="#B8A9FF"
+        backgroundColor="rgba(184,169,255,0.18)"
+        bindchange="onVisChange"
+      />
+    </view>
+  </view>
+
+  <view class="note-section mt-40">
+    <view class="section-title mb-16">想对 TA 说一句话？</view>
+    <view class="note-card glass-card">
+      <textarea
+        class="note-input"
+        placeholder="比如：今天吃到了你爱吃的蛋糕，想你了～（选填，120字内）"
+        maxlength="120"
+        value="{{note}}"
+        bindinput="onNoteInput"
+        auto-height
+      />
+      <view class="note-count">{{note.length}}/120</view>
+    </view>
+  </view>
+
+  <view class="ta-section mt-40" wx:if="{{taMood}}">
+    <view class="section-title mb-16">TA 今天的心情</view>
+    <view class="ta-card glass-card">
+      <view class="ta-orb" style="background: linear-gradient(135deg, {{taMood.color1}}, {{taMood.color2}});">
+        <text class="ta-emoji">{{taMood.emoji}}</text>
+      </view>
+      <view class="ta-info">
+        <view class="ta-name fw-700">TA · {{taMood.name}}</view>
+        <view class="ta-note muted fs-24 mt-8" wx:if="{{taMood.note}}">"{{taMood.note}}"</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="preview-section mt-40" wx:if="{{mergeResult}}">
+    <view class="section-title mb-16">合成的心情</view>
+    <view class="preview-card glass-card" style="background: linear-gradient(155deg, {{mergeResult.colors[0]}} 0%, {{mergeResult.colors[1]}} 100%);">
+      <view class="preview-emoji animate-float">{{mergeResult.emoji}}</view>
+      <view class="preview-name fw-800" style="color: {{mergeResult.text}};">{{mergeResult.name}}</view>
+      <view class="preview-quote" style="color: {{mergeResult.quoteColor}};">
+        "{{mergeResult.quote}}"
+      </view>
+    </view>
+  </view>
+
+  <view class="submit-wrap mt-48">
+    <view class="btn btn-primary btn-submit {{submitting || submitted ? 'btn-disabled' : ''}}" bindtap="submitMood">
+      <text wx:if="{{submitting}}">发送中…</text>
+      <text wx:elif="{{submitted}}">✓ 今日已记录</text>
+      <text wx:else>🌸 把今天的心情发给 TA</text>
+    </view>
+    <view class="btn btn-outline mt-20" wx:if="{{submitted}}" bindtap="goShare">
+      📤 生成今日心情卡
+    </view>
+  </view>
+  <view class="safe-bottom"></view>
+</view>

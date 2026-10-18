@@ -1,0 +1,355 @@
+page {
+  background: #FFFBF8;
+  color: #2B2438;
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+view, text, button, input, textarea, scroll-view, swiper, image {
+  box-sizing: border-box;
+}
+
+.container {
+  min-height: 100vh;
+  padding: 0 32rpx 360rpx;
+  position: relative;
+}
+
+.safe-bottom {
+  height: 200rpx;
+  width: 100%;
+}
+
+.page-title {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: #FF8FAB;
+}
+
+.page-sub {
+  font-size: 26rpx;
+  color: #7A6E8A;
+  margin-top: 8rpx;
+  font-weight: 500;
+}
+
+.gradient-text {
+  color: #FF8FAB;
+  font-weight: 700;
+}
+
+.rainbow-text {
+  color: #FFD27A;
+  font-weight: 700;
+}
+
+.glass-card {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FFF8FA 100%);
+  border-radius: 32rpx;
+  box-shadow: 0 16rpx 48rpx rgba(139, 119, 149, 0.10);
+  border: 1rpx solid rgba(240, 232, 234, 0.8);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃卡片装饰圆 */
+.glass-card::before {
+  content: "";
+  position: absolute;
+  top: -60rpx;
+  right: -60rpx;
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 143, 171, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.glass-card::after {
+  content: "";
+  position: absolute;
+  bottom: -80rpx;
+  left: -40rpx;
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(184, 169, 255, 0.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.solid-card {
+  background: #FFFFFF;
+  border-radius: 32rpx;
+  box-shadow: 0 8rpx 32rpx rgba(184, 169, 255, 0.10);
+  border: 1rpx solid #F0E8EA;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96rpx;
+  padding: 0 40rpx;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  border: none;
+}
+
+.btn-noborder {
+  border: none;
+}
+
+.btn-primary {
+  background: #FF8FAB;
+  color: #FFFFFF;
+  box-shadow: 0 12rpx 32rpx rgba(255, 143, 171, 0.30);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+  opacity: 0.92;
+}
+
+.btn-ghost {
+  background: #FFE8EE;
+  color: #FF8FAB;
+}
+
+.btn-ghost-lavender {
+  background: #EEE9FF;
+  color: #7A6BD6;
+}
+
+.btn-ghost-rose {
+  background: #FFE8EE;
+  color: #FF6B8E;
+}
+
+.btn-outline {
+  background: #FFFFFF;
+  color: #2B2438;
+  border: 1rpx solid #F0E8EA;
+}
+
+.btn-outline:active {
+  background: #FDFBFD;
+}
+
+.btn-wx {
+  background: #07C160;
+  color: #FFFFFF;
+  box-shadow: 0 12rpx 32rpx rgba(7, 193, 96, 0.28);
+}
+
+.btn-disabled {
+  background: #EDE8EE;
+  color: #A094AC;
+  box-shadow: none;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6rpx 20rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.tag-rose {
+  background: #FFE8EE;
+  color: #FF8FAB;
+}
+
+.tag-lavender {
+  background: #EEE9FF;
+  color: #7A6BD6;
+}
+
+.tag-sky {
+  background: #E5F3FB;
+  color: #4A90B8;
+}
+
+.tag-sun {
+  background: #FFF3D6;
+  color: #B8860B;
+}
+
+.tag-gray {
+  background: #F1EEF3;
+  color: #A094AC;
+}
+
+.field {
+  width: 100%;
+  height: 92rpx;
+  padding: 0 28rpx;
+  border-radius: 24rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #F0E8EA;
+  font-size: 28rpx;
+  color: #2B2438;
+}
+
+.field:focus {
+  border-color: #FF8FAB;
+  background: #FFFFFF;
+}
+
+.textarea {
+  width: 100%;
+  padding: 20rpx 28rpx;
+  border-radius: 24rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #F0E8EA;
+  font-size: 28rpx;
+  color: #2B2438;
+  min-height: 160rpx;
+}
+
+.divider {
+  height: 1rpx;
+  background: #F0E8EA;
+  margin: 24rpx 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  margin: 16rpx 0;
+  display: flex;
+  align-items: center;
+}
+
+.muted {
+  color: #7A6E8A;
+}
+
+.secondary {
+  color: #9A8EAA;
+}
+
+.hint {
+  color: #B5ACC4;
+}
+
+.mt-8 { margin-top: 8rpx; }
+.mt-16 { margin-top: 16rpx; }
+.mt-20 { margin-top: 20rpx; }
+.mt-24 { margin-top: 24rpx; }
+.mt-32 { margin-top: 32rpx; }
+.mt-40 { margin-top: 40rpx; }
+.mt-48 { margin-top: 48rpx; }
+.mb-8 { margin-bottom: 8rpx; }
+.mb-16 { margin-bottom: 16rpx; }
+.mb-20 { margin-bottom: 20rpx; }
+.mb-24 { margin-bottom: 24rpx; }
+.mb-32 { margin-bottom: 32rpx; }
+.mb-48 { margin-bottom: 48rpx; }
+.p-16 { padding: 16rpx; }
+.p-20 { padding: 20rpx; }
+.p-24 { padding: 24rpx; }
+.p-32 { padding: 32rpx; }
+.px-32 { padding-left: 32rpx; padding-right: 32rpx; }
+.py-24 { padding-top: 24rpx; padding-bottom: 24rpx; }
+.fs-22 { font-size: 22rpx; }
+.fs-24 { font-size: 24rpx; }
+.fs-26 { font-size: 26rpx; }
+.fs-28 { font-size: 28rpx; }
+.fs-30 { font-size: 30rpx; }
+.fs-32 { font-size: 32rpx; }
+.fs-36 { font-size: 36rpx; }
+.fs-40 { font-size: 40rpx; }
+.fs-48 { font-size: 48rpx; }
+.fs-56 { font-size: 56rpx; }
+.fs-72 { font-size: 72rpx; }
+.fs-96 { font-size: 96rpx; }
+.fw-500 { font-weight: 500; }
+.fw-600 { font-weight: 600; }
+.fw-700 { font-weight: 700; }
+.fw-800 { font-weight: 800; }
+.fw-900 { font-weight: 900; }
+.gap-8 > view + view { margin-left: 8rpx; margin-top: 8rpx; }
+.gap-12 > view + view { margin-left: 12rpx; margin-top: 12rpx; }
+.gap-16 > view + view { margin-left: 16rpx; margin-top: 16rpx; }
+.gap-20 > view + view { margin-left: 20rpx; margin-top: 20rpx; }
+.gap-24 > view + view { margin-left: 24rpx; margin-top: 24rpx; }
+.gap-32 > view + view { margin-left: 32rpx; margin-top: 32rpx; }
+.flex-1 { flex: 1; }
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.empty-state {
+  padding: 80rpx 40rpx;
+  text-align: center;
+}
+
+.empty-state .empty-emoji {
+  font-size: 96rpx;
+  margin-bottom: 20rpx;
+  display: block;
+}
+
+.empty-state .empty-text {
+  color: #A094AC;
+  font-size: 26rpx;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0rpx); }
+  50% { transform: translateY(-10rpx); }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes slowSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+.animate-slow-spin {
+  animation: slowSpin 30s linear infinite;
+}

@@ -1,0 +1,43 @@
+<view class="container">
+  <view class="detail-header">
+    <view class="detail-emoji">{{typeEmoji}}</view>
+    <view class="detail-name">{{typeName}}</view>
+    <view class="detail-date muted fs-22 mt-8">{{record.sport_date}} · {{record.user_name || '我'}}</view>
+  </view>
+
+  <view class="detail-stats glass-card mt-32">
+    <view class="detail-stat">
+      <view class="detail-num">{{formatDuration}}</view>
+      <view class="detail-label muted fs-22">运动时长</view>
+    </view>
+    <view class="detail-stat">
+      <view class="detail-num">{{record.distance || '0.00'}}</view>
+      <view class="detail-label muted fs-22">公里</view>
+    </view>
+    <view class="detail-stat">
+      <view class="detail-num">{{record.steps || 0}}</view>
+      <view class="detail-label muted fs-22">步数</view>
+    </view>
+  </view>
+
+  <view class="map-card glass-card mt-24">
+    <view class="map-title fw-700 fs-28">运动轨迹</view>
+    <map
+      id="detailMap"
+      class="detail-map"
+      latitude="{{centerLat}}"
+      longitude="{{centerLng}}"
+      scale="15"
+      polyline="{{polyline}}"
+      markers="{{markers}}"
+      enable-zoom="true"
+      enable-scroll="true"
+    ></map>
+    <view class="map-info muted fs-22 mt-16">共 {{points.length}} 个轨迹点 · 平均配速 {{pace}}</view>
+  </view>
+
+  <view wx:if="{{record.note}}" class="note-card glass-card mt-24">
+    <view class="note-title fw-700 fs-28">备注</view>
+    <view class="note-text muted fs-24 mt-12">{{record.note}}</view>
+  </view>
+</view>

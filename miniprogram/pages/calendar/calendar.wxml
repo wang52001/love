@@ -1,0 +1,142 @@
+<view class="container">
+  <view class="header-row mt-48 mb-16">
+    <view class="month-nav" bindtap="prevMonth">
+      <text class="nav-arrow">‹</text>
+    </view>
+    <view class="month-title">
+      <view class="page-title">{{year}}年{{month}}月</view>
+      <view class="page-sub">月度概览</view>
+    </view>
+    <view class="month-nav" bindtap="nextMonth">
+      <text class="nav-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 真实天气条 -->
+  <view class="real-weather-bar glass-card" wx:if="{{realWeather}}">
+    <text class="rw-bar-emoji">{{realWeather.weather_emoji}}</text>
+    <text class="rw-bar-temp">{{realWeather.temperature}}°C</text>
+    <text class="rw-bar-desc muted">{{realWeather.weather_desc}} · 湿度 {{realWeather.humidity}}%</text>
+  </view>
+
+  <view class="stats-row glass-card p-24 mt-24 mb-32">
+    <view class="stat-item">
+      <view class="stat-emoji">☀️</view>
+      <view class="stat-num sun-text">{{stats.sunny}}</view>
+      <view class="stat-label">开心</view>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <view class="stat-emoji">🌧️</view>
+      <view class="stat-num rain-text">{{stats.rainy}}</view>
+      <view class="stat-label">难过</view>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <view class="stat-emoji">🔥</view>
+      <view class="stat-num streak-text">{{stats.streak}}</view>
+      <view class="stat-label">连续开心</view>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <view class="stat-emoji">🌈</view>
+      <view class="stat-num rainbow-text">{{stats.rainbow}}</view>
+      <view class="stat-label">合拍</view>
+    </view>
+  </view>
+
+  <view class="weekdays mt-16">
+    <view class="weekday" wx:for="{{weekdays}}" wx:key="*this">{{item}}</view>
+  </view>
+
+  <view class="cal-grid glass-card p-20 mt-16">
+    <view
+      class="cal-cell {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.empty ? 'empty' : ''}}"
+      wx:for="{{calendarData}}"
+      wx:key="key"
+      bindtap="pickDate"
+      data-date="{{item.dateStr}}"
+    >
+      <view
+        class="cell-orb"
+        wx:if="{{!item.empty}}"
+        style="background: {{item.weather ? ('linear-gradient(135deg,' + item.colors[0] + ',' + item.colors[1] + ')') : 'linear-gradient(135deg, #F5F1F2, #EDE8F0)'}};"
+      >
+        <text class="cell-emoji" wx:if="{{item.weather}}">{{item.emoji}}</text>
+        <text class="cell-placeholder" wx:else>💭</text>
+        <text class="cell-num {{item.weather ? '' : 'placeholder-num'}}" wx:if="{{item.weather}}" style="color: {{item.textColor}};">{{item.dayNum}}</text>
+        <text class="cell-num placeholder-num" wx:else>{{item.dayNum}}</text>
+      </view>
+      <view class="cell-today-dot" wx:if="{{item.isToday && !item.weather}}"></view>
+    </view>
+  </view>
+
+  <view class="legend mt-32">
+    <view class="legend-item" wx:for="{{legendItems}}" wx:key="key">
+      <view class="legend-orb" style="background: linear-gradient(135deg, {{item.colors[0]}}, {{item.colors[1]}});"></view>
+      <text class="legend-label">{{item.name}}</text>
+    </view>
+  </view>
+
+  <view class="detail glass-card mt-32 p-32" wx:if="{{selectedDate}}">
+    <view class="detail-header row-between mb-20">
+      <view>
+        <view class="detail-date fw-700 fs-32">{{selectedDate.display}}</view>
+        <view class="detail-weather-name gradient-text mt-8 fs-28">{{selectedDate.weatherName || '这一天还没有记录'}}</view>
+      </view>
+      <view class="detail-emoji" wx:if="{{selectedDate.weatherName}}">
+        {{selectedDate.emoji}}
+      </view>
+      <view class="detail-emoji empty-emoji" wx:else>💭</view>
+    </view>
+    <block wx:if="{{selectedDate.weatherName}}">
+      <view class="detail-split"></view>
+      <view class="detail-sides mt-20">
+        <view class="side">
+          <view class="side-label muted fs-22 mb-8">TA 的心情</view>
+          <view class="side-card">
+            <view class="side-orb" style="background: linear-gradient(135deg, {{selectedDate.taColors[0]}}, {{selectedDate.taColors[1]}});">
+              {{selectedDate.taEmoji}}
+            </view>
+            <view class="side-info">
+              <view class="side-name fw-600 fs-26">{{selectedDate.taWeather}}</view>
+              <view class="side-note muted fs-22 mt-8" wx:if="{{selectedDate.taNote}}">"{{selectedDate.taNote}}"</view>
+              <view class="side-note muted fs-22 mt-8" wx:else>—</view>
+            </view>
+          </view>
+        </view>
+        <view class="vs-line">
+          <view class="vs-dot"></view>
+        </view>
+        <view class="side">
+          <view class="side-label muted fs-22 mb-8 text-right">我的心情</view>
+          <view class="side-card right">
+            <view class="side-info">
+              <view class="side-name fw-600 fs-26 text-right">{{selectedDate.myWeather}}</view>
+              <view class="side-note muted fs-22 mt-8 text-right" wx:if="{{selectedDate.myNote}}">"{{selectedDate.myNote}}"</view>
+              <view class="side-note muted fs-22 mt-8 text-right" wx:else>—</view>
+            </view>
+            <view class="side-orb" style="background: linear-gradient(135deg, {{selectedDate.myColors[0]}}, {{selectedDate.myColors[1]}});">
+              {{selectedDate.myEmoji}}
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="detail-rating mt-20" wx:if="{{selectedDate.taRating}}">
+        <text class="rating-label">TA 打了 </text>
+        <text class="rating-stars">{{selectedDate.taRatingStars}}</text>
+        <text class="rating-label"> 颗星</text>
+      </view>
+    </block>
+    <view class="detail-empty mt-8" wx:else>
+      <view class="fs-26 muted">那天还没有记录心情，往前翻翻看 ～</view>
+    </view>
+  </view>
+
+  <view class="go-report mt-40 mb-32">
+    <view class="btn btn-ghost-lavender" bindtap="goReport">
+      📊 生成本月气候报告
+    </view>
+  </view>
+  <view class="safe-bottom"></view>
+</view>

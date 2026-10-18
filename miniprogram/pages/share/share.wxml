@@ -1,0 +1,114 @@
+<view class="container">
+  <view class="top-head mt-40 mb-24 row-between">
+    <view>
+      <view class="page-title">今日心情卡</view>
+      <view class="page-sub mt-8">{{dateStr}}{{togetherDays ? ' · 第 ' + togetherDays + ' 天' : ''}}</view>
+    </view>
+  </view>
+
+  <view class="card-preview glass-card" style="background: linear-gradient(165deg, {{styles[activeStyle].bg1}} 0%, {{styles[activeStyle].bg2}} 60%, {{styles[activeStyle].bg3}} 100%);">
+    <view class="card-inner">
+      <view class="card-top row-between">
+        <view class="card-brand muted" style="color: {{styles[activeStyle].muted}};">情侣心情录 · 情侣气象站</view>
+        <view class="card-date" style="color: {{styles[activeStyle].ink}};">{{dateStr}}</view>
+      </view>
+
+      <view class="card-center">
+        <view class="card-weather-name" style="color: {{styles[activeStyle].ink}};">{{weatherName || '等待记录'}}</view>
+        <view class="card-emoji animate-float">{{weatherEmoji || '⛅'}}</view>
+        <view class="card-quote" style="color: {{styles[activeStyle].quote}}; white-space: pre-line;">
+          {{quote}}
+        </view>
+      </view>
+
+      <view class="card-split" style="background: {{styles[activeStyle].splitBg}};"></view>
+
+      <view class="card-sides row">
+        <view class="card-side">
+          <view class="side-av-wrap">
+            <image wx:if="{{myAvatar && !myAvatarError}}" src="{{myAvatar}}" class="side-av" mode="aspectFill" binderror="onAvatarError" data-side="my"></image>
+            <view wx:else class="side-av side-av-ph" style="background: {{styles[activeStyle].qrBg}}; color: {{styles[activeStyle].qrText}};">{{myInitial}}</view>
+          </view>
+          <view class="side-label fs-20 mt-12" style="color: {{styles[activeStyle].muted}};">我 · {{myName}}</view>
+          <view class="side-value fw-600 fs-24 mt-6" style="color: {{styles[activeStyle].ink}};">{{myWeather}}</view>
+        </view>
+        <view class="card-divider" style="background: {{styles[activeStyle].divider}};"></view>
+        <view class="card-side text-right">
+          <view class="side-av-wrap side-av-right">
+            <image wx:if="{{taAvatar && !taAvatarError}}" src="{{taAvatar}}" class="side-av" mode="aspectFill" binderror="onAvatarError" data-side="ta"></image>
+            <view wx:else class="side-av side-av-ph" style="background: {{styles[activeStyle].qrBg}}; color: {{styles[activeStyle].qrText}};">{{taInitial}}</view>
+          </view>
+          <view class="side-label fs-20 mt-12" style="color: {{styles[activeStyle].muted}};">TA · {{taName}}</view>
+          <view class="side-value fw-600 fs-24 mt-6" style="color: {{styles[activeStyle].ink}};">{{taWeather}}</view>
+        </view>
+      </view>
+
+      <view wx:if="{{taRating > 0}}" style="color: {{styles[activeStyle].ink}}; font-size: 24rpx; font-weight: 600; text-align: center; padding: 12rpx 0;">
+        TA ⭐ x {{taRating}}
+      </view>
+
+      <view class="card-watermark">
+        <view class="watermark-text" style="color: {{styles[activeStyle].watermark}};">情侣心情录 · 我们俩的私人心情台</view>
+        <view style="display: flex; flex-direction: column; align-items: center;">
+          <image wx:if="{{qrBase64}}" class="watermark-qr" src="{{qrBase64}}" mode="aspectFill"></image>
+          <view wx:else class="watermark-qr watermark-qr-ph" style="background: {{styles[activeStyle].qrBg}}; color: {{styles[activeStyle].qrText}};">
+            {{qrPlaceholderText}}
+          </view>
+          <view wx:if="{{inviteCode}}" style="color: {{styles[activeStyle].muted}}; font-size: 18rpx; margin-top: 6rpx;">邀请码 {{inviteCode}}</view>
+        </view>
+      </view>
+    </view>
+    <canvas type="2d" id="shareCanvas" class="canvas-hidden"></canvas>
+  </view>
+
+  <view class="styles-wrap mt-32">
+    <view class="styles-title row-between mb-16">
+      <view class="section-title">选择卡片风格</view>
+      <view class="muted fs-22">共 {{styles.length}} 款</view>
+    </view>
+    <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="styles-scroll">
+      <view class="styles-track">
+        <view
+          class="style-opt {{activeStyle === idx ? 'active' : ''}}"
+          wx:for="{{styles}}"
+          wx:for-index="idx"
+          wx:key="name"
+          bindtap="pickStyle"
+          data-idx="{{idx}}"
+          style="background: linear-gradient(165deg, {{item.bg1}}, {{item.bg2}} 60%, {{item.bg3}});"
+        >
+          <view class="style-preview-emoji">{{item.previewEmoji}}</view>
+          <view class="style-name" style="color: {{item.ink}};">{{item.name}}</view>
+          <view class="style-tick" wx:if="{{activeStyle === idx}}">✓</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="actions mt-48 mb-48">
+    <view class="btn btn-save-photo" bindtap="saveImage">
+      <text class="save-emoji">💾</text>
+      <text>保存到相册 · 然后发微信给 TA</text>
+    </view>
+    <view class="share-tip-card mt-28">
+      <view class="tip-title-row">
+        <text class="tip-star">🌟</text>
+        <text class="tip-title fw-700 fs-24">保存后这样发给 TA</text>
+      </view>
+      <view class="tip-line mt-14">
+        <text class="tip-dot">1</text>
+        <text class="tip-text muted fs-22">点上面按钮，把海报<strong class="tip-em">保存到相册</strong>（允许一下权限就一次）</text>
+      </view>
+      <view class="tip-line mt-12">
+        <text class="tip-dot">2</text>
+        <text class="tip-text muted fs-22">切到微信聊天框，点<strong class="tip-em">「+」→ 相册</strong> 选刚存的海报</text>
+      </view>
+      <view class="tip-line mt-12">
+        <text class="tip-dot">3</text>
+        <text class="tip-text muted fs-22">也可以点右上角 <text class="tip-menu">「…」</text> → <strong class="tip-em">转发给朋友</strong>（海报自动预览直接发</text>
+      </view>
+    </view>
+    <view class="muted fs-20 text-center mt-28">右上角「…」还可以分享到朋友圈哦 🌟</view>
+  </view>
+  <view class="safe-bottom"></view>
+</view>

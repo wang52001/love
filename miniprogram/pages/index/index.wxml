@@ -1,0 +1,240 @@
+<view class="container">
+  <view class="header">
+    <view class="greeting">
+      <view class="greeting-emoji animate-float">🌤️</view>
+      <view>
+        <view class="page-title">我们的心情录</view>
+        <view class="page-sub" wx:if="{{isGuest}}">
+          <text class="link" bindtap="goLogin">👉 登录后绑定 TA</text>
+        </view>
+        <view class="page-sub" wx:elif="{{coupleInfo && coupleInfo.bind_date}}">
+          在一起第 <text class="days-num">{{togetherDays}}</text> 天 · 已绑定
+        </view>
+        <view class="page-sub" wx:else bindtap="goBind">
+          <text class="link">👉 点击邀请 TA 绑定</text>
+        </view>
+      </view>
+    </view>
+    <view class="header-right" bindtap="goShare">
+      <view class="share-btn">✨</view>
+    </view>
+  </view>
+
+  <!-- 双方真实天气 -->
+  <view class="couple-weather-section" wx:if="{{coupleWeather && (coupleWeather.me || coupleWeather.ta)}}">
+    <view class="row-between mb-16">
+      <view class="section-title">我们的天气</view>
+      <view class="muted fs-22">点击卡片查看预报</view>
+    </view>
+    <view class="couple-weather-row">
+      <view
+        class="weather-card glass-card {{coupleWeather.me ? '' : 'weather-card-empty'}}"
+        wx:if="{{coupleWeather.me}}"
+        bindtap="goWeatherDetail"
+        data-lat="{{coupleWeather.me.lat}}"
+        data-lon="{{coupleWeather.me.lng}}"
+        data-city="{{coupleWeather.me.city}}"
+        data-address="{{coupleWeather.me.address}}"
+      >
+        <view class="weather-card-label">我</view>
+        <view class="weather-card-location">
+          <text class="weather-card-city">{{coupleWeather.me.displayDistrict || '我的位置'}}</text>
+        </view>
+        <view class="weather-card-main">
+          <text class="weather-card-emoji">{{coupleWeather.me.weather_emoji}}</text>
+          <text class="weather-card-temp">{{coupleWeather.me.temperature}}°</text>
+        </view>
+        <view class="weather-card-meta muted">
+          <text>{{coupleWeather.me.weather_desc}}</text>
+          <text wx:if="{{coupleWeather.me.humidity}}"> · 湿度 {{coupleWeather.me.humidity}}%</text>
+        </view>
+      </view>
+      <view
+        class="weather-card glass-card {{coupleWeather.ta ? '' : 'weather-card-empty'}}"
+        wx:if="{{coupleWeather.ta}}"
+        bindtap="goWeatherDetail"
+        data-lat="{{coupleWeather.ta.lat}}"
+        data-lon="{{coupleWeather.ta.lng}}"
+        data-city="{{coupleWeather.ta.city}}"
+        data-address="{{coupleWeather.ta.address}}"
+      >
+        <view class="weather-card-label">TA</view>
+        <view class="weather-card-location">
+          <text class="weather-card-city">{{coupleWeather.ta.displayDistrict || 'TA的位置'}}</text>
+        </view>
+        <view class="weather-card-main">
+          <text class="weather-card-emoji">{{coupleWeather.ta.weather_emoji}}</text>
+          <text class="weather-card-temp">{{coupleWeather.ta.temperature}}°</text>
+        </view>
+        <view class="weather-card-meta muted">
+          <text>{{coupleWeather.ta.weather_desc}}</text>
+          <text wx:if="{{coupleWeather.ta.humidity}}"> · 湿度 {{coupleWeather.ta.humidity}}%</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bind-alert glass-card" wx:if="{{bindAlert && !isGuest}}" bindtap="{{bindAlert.action}}">
+    <view class="bind-alert-icon">{{bindAlert.icon}}</view>
+    <view class="bind-alert-body">
+      <view class="bind-alert-title">{{bindAlert.title}}</view>
+      <view class="bind-alert-desc">{{bindAlert.desc}}</view>
+    </view>
+    <view class="bind-alert-arrow">›</view>
+  </view>
+
+  <view class="weather-hero glass-card" style="background: linear-gradient(155deg, {{heroColors[0]}} 0%, {{heroColors[1]}} 100%);">
+    <view class="hero-glow"></view>
+    <view class="hero-glow hero-glow-2"></view>
+    <view class="hero-inner">
+      <view class="weather-disk animate-breathe">
+        <view class="disk-ring disk-ring-outer animate-slow-spin"></view>
+        <view class="disk-ring disk-ring-mid animate-slow-spin" style="animation-duration: 22s; animation-direction: reverse;"></view>
+        <view class="disk-pulse"></view>
+        <view class="disk-emoji animate-float-slow">{{todayWeather.emoji || '☁️'}}</view>
+      </view>
+      <view class="hero-name mt-24" style="color: {{heroTextColor}};">{{todayWeather.name || '今天的天空还是空白'}}</view>
+      <view class="hero-quote" wx:if="{{todayWeather.quote}}" style="color: {{heroQuoteColor}};">
+        "{{todayWeather.quote}}"
+      </view>
+      <view class="hero-quote" wx:else style="color: {{heroQuoteColor}};">
+        来记录今天的第一朵云吧 ~
+      </view>
+      <view class="hero-sub" wx:if="{{partialHint}}" style="color: {{heroQuoteColor}};">
+        {{partialHint}}
+      </view>
+      <!-- 评分 -->
+      <view class="hero-rating" wx:if="{{taRating > 0 || myRating > 0}}">
+        <view class="rating-pill" wx:if="{{taRating > 0}}">
+          <text class="muted fs-22">你给 TA</text>
+          <text class="rating-stars-sm">{{taRating === 1 ? '⭐' : taRating === 2 ? '⭐⭐' : taRating === 3 ? '⭐⭐⭐' : taRating === 4 ? '⭐⭐⭐⭐' : '⭐⭐⭐⭐⭐'}}</text>
+        </view>
+        <view class="rating-pill" wx:if="{{myRating > 0}}">
+          <text class="muted fs-22">TA 给你</text>
+          <text class="rating-stars-sm">{{myRating === 1 ? '⭐' : myRating === 2 ? '⭐⭐' : myRating === 3 ? '⭐⭐⭐' : myRating === 4 ? '⭐⭐⭐⭐' : '⭐⭐⭐⭐⭐'}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="mood-cta-wrap mt-32">
+    <view wx:if="{{isGuest}}" class="btn btn-primary btn-cta animate-pulse-glow" bindtap="goLogin">
+      <text class="cta-emoji">💕</text>
+      <text>登录开启情侣心情录</text>
+    </view>
+    <view wx:elif="{{!hasRecordedToday}}" class="btn btn-primary btn-cta animate-pulse-glow" bindtap="goMood">
+      <text class="cta-emoji">🌸</text>
+      <text>记录今日心情</text>
+    </view>
+    <view wx:else class="btn btn-disabled btn-cta">
+      <text class="cta-emoji">✓</text>
+      <text>今日已记录</text>
+    </view>
+  </view>
+
+  <!-- AI 心情日报 -->
+  <view class="ai-report-section mt-32" wx:if="{{!isGuest && (aiReport || aiReportLoading || aiReportTip)}}">
+    <view class="row-between mb-16">
+      <view class="section-title">✨ AI 心情日报</view>
+      <view class="ai-refresh-btn muted fs-22" wx:if="{{aiReport && !aiReportLoading}}" bindtap="refreshAIReport">换一篇 ›</view>
+    </view>
+    <view class="ai-report-card glass-card" bindtap="{{aiReportTip ? 'refreshAIReport' : 'noop'}}">
+      <view class="ai-report-loading" wx:if="{{aiReportLoading}}">
+        <view class="ai-loader-dot"></view>
+        <view class="ai-loader-dot"></view>
+        <view class="ai-loader-dot"></view>
+        <text class="ai-loader-text muted fs-24">AI 正在为你们写日报…</text>
+      </view>
+      <block wx:elif="{{aiReport}}">
+        <view class="ai-report-header">
+          <text class="ai-report-badge">🤖 AI 日报</text>
+          <text class="ai-report-shared" wx:if="{{aiShared}}">合体心情 · {{aiShared}}</text>
+        </view>
+        <view class="ai-report-text">{{aiReport}}</view>
+        <view class="ai-report-foot muted fs-20 mt-12">—— 根据你们今日心情自动生成</view>
+      </block>
+      <view wx:else class="ai-report-empty">
+        <text class="ai-report-emoji">🌤️</text>
+        <text class="ai-report-tip muted fs-24">{{aiReportTip}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="quick-grid mt-40">
+    <view class="quick-item glass-card" bindtap="goCalendar">
+      <view class="quick-icon" style="background: linear-gradient(135deg, #B8A9FF, #D4CBFF);">📅</view>
+      <view class="quick-name">心情日历</view>
+      <view class="quick-desc">回看每一天</view>
+    </view>
+    <view class="quick-item glass-card" bindtap="goReport">
+      <view class="quick-icon" style="background: linear-gradient(135deg, #FF8FAB, #FFB3C6);">📊</view>
+      <view class="quick-name">心情报告</view>
+      <view class="quick-desc">月度关系复盘</view>
+    </view>
+    <view class="quick-item glass-card" bindtap="goLocation">
+      <view class="quick-icon" style="background: linear-gradient(135deg, #87CEEB, #BEE3F5);">📍</view>
+      <view class="quick-name">TA的位置</view>
+      <view class="quick-desc">知道你在就安心</view>
+    </view>
+    <view class="quick-item glass-card" bindtap="goWish">
+      <view class="quick-icon" style="background: linear-gradient(135deg, #FFD27A, #FFE8A8);">💌</view>
+      <view class="quick-name">心愿心情</view>
+      <view class="quick-desc">许下明天的期待</view>
+    </view>
+  </view>
+
+  <view class="week-section mt-40">
+    <view class="row-between mb-24">
+      <view class="section-title">我们的心情回忆</view>
+      <view class="muted fs-22" bindtap="goCalendar">查看全部 ›</view>
+    </view>
+    <scroll-view wx:if="{{weekData.length}}" scroll-x class="week-scroll" enhanced show-scrollbar="{{false}}">
+      <view class="week-list">
+        <view
+          class="week-card glass-card {{item.isToday ? 'week-card-today' : ''}}"
+          wx:for="{{weekData}}"
+          wx:key="date"
+          bindtap="goCalendar"
+        >
+          <view class="week-card-date">
+            <text class="week-card-weekday">{{item.label}}</text>
+            <text class="week-card-mday">{{item.monthDay}}</text>
+            <view wx:if="{{item.isToday}}" class="week-card-tag">今天</view>
+          </view>
+          <view class="week-card-orb" style="background: linear-gradient(135deg, {{item.colors[0]}}, {{item.colors[1]}});">
+            <text class="week-card-emoji" style="color: {{item.textColor}};">{{item.emoji}}</text>
+          </view>
+          <view class="week-card-name" style="color: {{item.textColor}};">{{item.weather || '—'}}</view>
+        </view>
+      </view>
+    </scroll-view>
+    <view wx:else class="week-empty glass-card p-32">
+      <view class="week-empty-emoji">🌱</view>
+      <view class="week-empty-text">还没有心情回忆哦</view>
+      <view class="week-empty-sub">记录今天的心情，开始你们的专属心情录吧</view>
+    </view>
+  </view>
+
+  <view class="alert-section mt-40" wx:if="{{alertInfo}}">
+    <view class="alert-card glass-card {{alertInfo.type}}">
+      <view class="alert-icon">{{alertInfo.icon}}</view>
+      <view class="alert-body">
+        <view class="alert-title">{{alertInfo.title}}</view>
+        <view class="alert-desc">{{alertInfo.desc}}</view>
+      </view>
+      <view class="alert-arrow" bindtap="goAlert">›</view>
+    </view>
+  </view>
+
+  <view class="wish-preview mt-40" wx:if="{{wishInfo}}">
+    <view class="section-title mb-24">明天的心愿预报</view>
+    <view class="wish-card glass-card" bindtap="goWish">
+      <view class="wish-emoji animate-float">{{wishInfo.emoji}}</view>
+      <view class="wish-info">
+        <view class="wish-title">TA 希望明天是 <text class="gradient-text">{{wishInfo.weather}}</text></view>
+        <view class="wish-reason muted fs-24 mt-8" wx:if="{{wishInfo.reason}}">"{{wishInfo.reason}}"</view>
+      </view>
+    </view>
+  </view>
+  <view class="safe-bottom"></view>
+</view>

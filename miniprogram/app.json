@@ -1,0 +1,65 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/mood/mood",
+    "pages/calendar/calendar",
+    "pages/report/report",
+    "pages/alert/alert",
+    "pages/share/share",
+    "pages/wish/wish",
+    "pages/location/location",
+    "pages/profile/profile",
+    "pages/bind/bind",
+    "pages/weather-detail/weather-detail",
+    "pages/quiz/quiz",
+    "pages/bill/bill",
+    "pages/sport/sport",
+    "pages/sport-track/sport-track",
+    "pages/sport-detail/sport-detail",
+    "pages/timer/timer",
+    "pages/period/period",
+    "pages/cook/cook",
+    "pages/vip/vip"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FFFBF8",
+    "navigationBarTitleText": "情侣心情录",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFFBF8"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#B5A8B8",
+    "selectedColor": "#FF8FAB",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "心情"
+      },
+      {
+        "pagePath": "pages/calendar/calendar",
+        "text": "日历"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.writePhotosAlbum": {
+      "desc": "用于保存天气海报卡片到相册，分享给你的另一半"
+    },
+    "scope.userLocation": {
+      "desc": "用于情侣地图展示双方位置和距离"
+    }
+  },
+  "requiredPrivateInfos": ["getLocation", "onLocationChange", "startLocationUpdate", "startLocationUpdateBackground"],
+  "requiredBackgroundModes": ["location"]
+}

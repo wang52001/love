@@ -1,0 +1,60 @@
+<view class="container">
+  <view class="header mt-40">
+    <view class="page-title">{{displayDistrict || city || '天气预报'}}</view>
+    <view class="page-sub muted mt-8">{{displayAddress || '未来 24 小时 & 7 天预报'}}</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-wrap mt-120">
+    <view class="loading-emoji animate-float">🌤️</view>
+    <view class="muted mt-16">正在加载预报…</view>
+  </view>
+
+  <block wx:else>
+    <!-- 当前天气 -->
+    <view class="current-card glass-card mt-32" wx:if="{{current}}">
+      <view class="current-main">
+        <view class="current-emoji">{{current.weather_emoji}}</view>
+        <view class="current-temp">{{current.temperature}}°</view>
+      </view>
+      <view class="current-meta">
+        <view class="current-desc">{{current.weather_desc}}</view>
+        <view class="current-sub muted">湿度 {{current.humidity}}% · 风速 {{current.wind_speed}}km/h</view>
+      </view>
+    </view>
+
+    <!-- 24 小时预报 -->
+    <view class="section mt-40" wx:if="{{hourly.length}}">
+      <view class="section-title mb-20">⏰ 未来 24 小时</view>
+      <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="hour-scroll">
+        <view class="hour-list">
+          <view class="hour-item glass-card" wx:for="{{hourly}}" wx:key="time">
+            <view class="hour-time">{{item.time}}</view>
+            <view class="hour-emoji">{{item.weather_emoji}}</view>
+            <view class="hour-temp">{{item.temp}}°</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 未来 7 天 -->
+    <view class="section mt-40" wx:if="{{daily.length}}">
+      <view class="section-title mb-20">📅 未来 7 天</view>
+      <view class="day-list glass-card">
+        <view class="day-item {{index === 0 ? 'day-today' : ''}}" wx:for="{{daily}}" wx:key="date">
+          <view class="day-left">
+            <view class="day-weekday">{{index === 0 ? '今天' : item.weekday}}</view>
+            <view class="day-date muted">{{item.date}}</view>
+          </view>
+          <view class="day-emoji">{{item.weather_emoji}}</view>
+          <view class="day-weather">{{item.weather_desc}}</view>
+          <view class="day-temps">
+            <text class="day-max">{{item.temp_max}}°</text>
+            <text class="day-min muted">/ {{item.temp_min}}°</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <view class="safe-bottom"></view>
+</view>

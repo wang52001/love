@@ -1,0 +1,296 @@
+.quiz-header {
+  padding-top: 32rpx;
+  text-align: center;
+}
+.quiz-emoji {
+  font-size: 80rpx;
+}
+.page-title {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: #2B2438;
+  margin-top: 12rpx;
+}
+.page-sub {
+  font-size: 24rpx;
+  color: #A094AC;
+}
+.loading-card {
+  padding: 48rpx 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ai-loader-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF8FAB, #B8A9FF);
+  margin: 0 6rpx;
+  animation: aiLoaderBounce 1.2s ease-in-out infinite;
+}
+.ai-loader-dot:nth-child(2) { animation-delay: 0.2s; }
+.ai-loader-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes aiLoaderBounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
+}
+.progress-bar {
+  height: 8rpx;
+  border-radius: 999rpx;
+  background: #F0E8EA;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: linear-gradient(90deg, #FF8FAB, #B8A9FF);
+  transition: width 0.3s ease;
+}
+.question-card {
+  padding: 40rpx 32rpx;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(255, 179, 198, 0.18) 0%, rgba(255, 179, 198, 0) 55%),
+    radial-gradient(circle at 100% 100%, rgba(184, 169, 255, 0.16) 0%, rgba(184, 169, 255, 0) 60%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 255, 0.92));
+  border: 2rpx solid rgba(184, 169, 255, 0.28);
+}
+.question-num {
+  font-size: 22rpx;
+  color: #B8A9FF;
+  font-weight: 700;
+  margin-bottom: 16rpx;
+}
+.question-text {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #2B2438;
+  line-height: 1.5;
+  margin-bottom: 32rpx;
+}
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.option-item {
+  padding: 28rpx 24rpx;
+  border-radius: 24rpx;
+  background: #FFFBF8;
+  border: 2rpx solid #F0E8EA;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+.option-item.selected {
+  background: linear-gradient(135deg, rgba(255, 143, 171, 0.12), rgba(184, 169, 255, 0.16));
+  border-color: #FF8FAB;
+  box-shadow: 0 4rpx 16rpx rgba(255, 143, 171, 0.15);
+}
+.option-letter {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF8FAB, #B8A9FF);
+  color: #FFFFFF;
+  font-size: 24rpx;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.option-text {
+  font-size: 28rpx;
+  color: #2B2438;
+  font-weight: 500;
+}
+.custom-option {
+  padding-top: 8rpx;
+}
+.custom-toggle {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 8rpx;
+}
+.custom-dot {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  border: 2rpx solid #D4CBFF;
+  margin-right: 14rpx;
+  background: #FFFFFF;
+  transition: all 0.2s ease;
+}
+.custom-dot.checked {
+  background: linear-gradient(135deg, #FF8FAB, #B8A9FF);
+  border-color: #FF8FAB;
+}
+.custom-label {
+  font-size: 26rpx;
+  color: #7A6B95;
+}
+.custom-input-wrap {
+  padding: 0 8rpx;
+}
+.custom-input {
+  height: 88rpx;
+  padding: 0 24rpx;
+  border-radius: 24rpx;
+  background: #FFFFFF;
+  border: 2rpx solid #F0E8EA;
+  font-size: 28rpx;
+  color: #2B2438;
+}
+.nav-row {
+  display: flex;
+  gap: 20rpx;
+}
+.nav-btn {
+  flex: 1;
+  height: 96rpx;
+  border-radius: 999rpx;
+  background: #FFFFFF;
+  border: 2rpx solid #F0E8EA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: #2B2438;
+  font-weight: 600;
+}
+.nav-btn.disabled {
+  opacity: 0.45;
+}
+.nav-next {
+  background: linear-gradient(135deg, #FF8FAB, #B8A9FF);
+  color: #FFFFFF;
+  border: none;
+  box-shadow: 0 8rpx 24rpx rgba(255, 143, 171, 0.28);
+}
+.result-card {
+  padding: 48rpx 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 179, 198, 0.22) 0%, rgba(255, 179, 198, 0) 60%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 255, 0.92));
+}
+.result-ring {
+  width: 240rpx;
+  height: 240rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx;
+  box-sizing: border-box;
+}
+.result-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #FFFBF8;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+.result-score {
+  font-size: 80rpx;
+  font-weight: 900;
+  color: #FF8FAB;
+}
+.result-unit {
+  font-size: 32rpx;
+  color: #FF8FAB;
+  font-weight: 700;
+}
+.result-label {
+  font-size: 26rpx;
+  color: #A094AC;
+}
+.result-comment {
+  font-size: 28rpx;
+  color: #2B2438;
+  line-height: 1.7;
+  text-align: center;
+}
+.compare-card {
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  background: #FFFFFF;
+  border: 1rpx solid #F0E8EA;
+}
+.compare-question {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #2B2438;
+  margin-bottom: 20rpx;
+}
+.compare-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.compare-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16rpx 12rpx;
+  border-radius: 20rpx;
+  background: #FFFBF8;
+  border: 2rpx solid #F0E8EA;
+}
+.compare-side.match {
+  background: linear-gradient(135deg, rgba(255, 143, 171, 0.1), rgba(184, 169, 255, 0.12));
+  border-color: #FF8FAB;
+}
+.compare-tag {
+  font-size: 20rpx;
+  color: #A094AC;
+  margin-bottom: 6rpx;
+}
+.compare-answer {
+  font-size: 26rpx;
+  color: #2B2438;
+  font-weight: 600;
+  text-align: center;
+}
+.compare-vs {
+  width: 56rpx;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 800;
+  color: #B8A9FF;
+}
+.wait-card {
+  padding: 56rpx 40rpx;
+  text-align: center;
+}
+.wait-emoji {
+  font-size: 72rpx;
+}
+.empty-card {
+  padding: 56rpx 40rpx;
+  text-align: center;
+}
+.empty-emoji {
+  font-size: 72rpx;
+}
+.section-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #2B2438;
+}
+.mt-8 { margin-top: 8rpx; }
+.mt-12 { margin-top: 12rpx; }
+.mt-16 { margin-top: 16rpx; }
+.mt-20 { margin-top: 20rpx; }
+.mt-24 { margin-top: 24rpx; }
+.mt-32 { margin-top: 32rpx; }
+.mt-40 { margin-top: 40rpx; }
+.mt-48 { margin-top: 48rpx; }
+.mb-16 { margin-bottom: 16rpx; }

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>小气候 · 管理后台</title>
+<style>
+  :root{
+    --bg:#FAF7FF;--ink:#2B2438;--muted:#8B8098;--line:#ECE6F0;
+    --rose:#FF8FAB;--lavender:#B8A9FF;--sun:#FFD27A;--sky:#87CEEB;
+    --ok:#10B981;--warn:#F59E0B;--danger:#EF4444;
+    --card:#FFFFFF;--shadow:0 12px 40px rgba(184,169,255,.10);
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+  body::before{
+    content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 40% at 90% -10%, rgba(255,143,171,.14), transparent 60%),
+      radial-gradient(ellipse 60% 40% at -10% 10%, rgba(184,169,255,.16), transparent 60%);
+  }
+  .app{min-height:100vh;display:flex;}
+  .sidebar{
+    width:260px;background:linear-gradient(180deg,#2B2438,#3A2F50);
+    color:#fff;padding:28px 20px;position:sticky;top:0;height:100vh;
+    display:flex;flex-direction:column;gap:12px;
+  }
+  .brand{display:flex;align-items:center;gap:12px;padding:4px 8px 20px;border-bottom:1px solid rgba(255,255,255,.1);}
+  .brand-logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--rose),var(--lavender));display:flex;align-items:center;justify-content:center;font-size:22px;}
+  .brand-name{font-weight:800;font-size:18px;letter-spacing:.3px;}
+  .brand-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px;}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;color:rgba(255,255,255,.75);font-size:14px;cursor:pointer;transition:.15s;}
+  .nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+  .nav-item.active{background:linear-gradient(135deg,rgba(255,143,171,.25),rgba(184,169,255,.25));color:#fff;font-weight:600;}
+  .nav-item .nav-emoji{font-size:18px;}
+  .sidebar-bottom{margin-top:auto;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);font-size:12px;color:rgba(255,255,255,.45);display:flex;align-items:center;justify-content:space-between;}
+  .sidebar-bottom .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(16,185,129,.18);}
+
+  .main{flex:1;min-width:0;padding:32px 40px 60px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+  .page-title{font-size:26px;font-weight:800;letter-spacing:-.3px;
+    background:linear-gradient(135deg,var(--rose),var(--lavender));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .page-sub{font-size:13px;color:var(--muted);margin-top:4px;}
+  .top-right{display:flex;gap:12px;align-items:center;}
+  .endpoint{font-size:12px;color:var(--muted);padding:8px 14px;background:var(--card);border:1px solid var(--line);border-radius:12px;}
+
+  .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:40px;}
+  .login-card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:48px 40px;box-shadow:var(--shadow);width:100%;max-width:420px;}
+  .login-title{font-size:28px;font-weight:800;margin-bottom:6px;
+    background:linear-gradient(135deg,var(--rose),var(--lavender));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .login-sub{font-size:13px;color:var(--muted);margin-bottom:32px;}
+  .field{width:100%;height:50px;padding:0 16px;border-radius:14px;border:1px solid var(--line);background:#FAF8FC;font-size:14px;color:var(--ink);outline:none;transition:.15s;}
+  .field:focus{border-color:var(--rose);background:#fff;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;height:50px;padding:0 22px;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:.15s;}
+  .btn-primary{background:linear-gradient(135deg,var(--rose),var(--lavender));color:#fff;box-shadow:0 10px 28px rgba(255,143,171,.30);}
+  .btn-primary:hover{transform:translateY(-1px);}
+  .btn-ghost{background:rgba(184,169,255,.10);color:#7A6BD6;}
+  .w-full{width:100%;}
+  .label{font-size:12px;color:var(--muted);margin-bottom:8px;display:block;}
+  .mb-4{margin-bottom:16px;}
+  .err{color:var(--danger);font-size:12px;margin-top:12px;min-height:18px;}
+
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+  .kpi-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px 20px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+  .kpi-card::after{content:"";position:absolute;width:140px;height:140px;border-radius:50%;right:-50px;top:-50px;opacity:.45;pointer-events:none;}
+  .kpi-card.k1::after{background:radial-gradient(circle,rgba(255,210,122,.50),transparent 70%);}
+  .kpi-card.k2::after{background:radial-gradient(circle,rgba(255,143,171,.40),transparent 70%);}
+  .kpi-card.k3::after{background:radial-gradient(circle,rgba(184,169,255,.45),transparent 70%);}
+  .kpi-card.k4::after{background:radial-gradient(circle,rgba(135,206,235,.45),transparent 70%);}
+  .kpi-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:10px;position:relative;}
+  .kpi-value{font-size:34px;font-weight:900;letter-spacing:-.5px;position:relative;}
+  .k1 .kpi-value{color:#D9950F;}
+  .k2 .kpi-value{color:var(--rose);}
+  .k3 .kpi-value{color:#7A6BD6;}
+  .k4 .kpi-value{color:#4A90B8;}
+
+  .tabs{display:flex;gap:8px;background:var(--card);padding:6px;border-radius:14px;border:1px solid var(--line);width:fit-content;margin-bottom:20px;}
+  .tab{padding:10px 18px;font-size:13px;font-weight:600;border-radius:10px;color:var(--muted);cursor:pointer;}
+  .tab.active{background:linear-gradient(135deg,rgba(255,143,171,.12),rgba(184,169,255,.14));color:var(--ink);}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;}
+  .tbl{width:100%;border-collapse:collapse;}
+  .tbl th{text-align:left;font-size:12px;font-weight:700;color:var(--muted);padding:14px 18px;background:#FAF8FC;border-bottom:1px solid var(--line);white-space:nowrap;}
+  .tbl td{font-size:13px;padding:14px 18px;border-bottom:1px solid var(--line);vertical-align:middle;}
+  .tbl tr:last-child td{border-bottom:none;}
+  .tbl tr:hover td{background:#FAF8FC;}
+  .av{width:34px;height:34px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:800;background:linear-gradient(135deg,var(--rose),var(--lavender));margin-right:10px;vertical-align:middle;}
+  .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;}
+  .badge.ok{background:rgba(16,185,129,.12);color:#059669;}
+  .badge.wait{background:rgba(245,158,11,.14);color:#D97706;}
+  .badge.off{background:rgba(139,128,152,.16);color:var(--muted);}
+  .muted{color:var(--muted);}
+  .btn-sm{height:34px;padding:0 14px;font-size:12px;border-radius:10px;}
+
+  .map-panel{padding:24px;}
+  .map-wrap{position:relative;height:360px;border-radius:16px;background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, #E6F0FA 0%, #F0E6F9 40%, #FBEFF4 80%);
+    overflow:hidden;}
+  .map-pin{position:absolute;width:14px;height:14px;border-radius:50%;transform:translate(-50%,-50%);
+    background:var(--rose);box-shadow:0 0 0 4px rgba(255,143,171,.22);}
+  .map-pin.p2{background:var(--lavender);box-shadow:0 0 0 4px rgba(184,169,255,.22);}
+  .map-pin.p3{background:var(--sun);box-shadow:0 0 0 4px rgba(255,210,122,.25);}
+  .legend-row{display:flex;gap:20px;flex-wrap:wrap;margin-top:16px;}
+  .legend-row .li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);}
+  .legend-row .li .ld{width:10px;height:10px;border-radius:50%;}
+
+  .hidden{display:none !important;}
+  .pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);}
+  .pager{display:flex;gap:6px;}
+  .pager button{min-width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:12px;}
+  .pager button.active{background:linear-gradient(135deg,var(--rose),var(--lavender));color:#fff;border-color:transparent;}
+
+  @media (max-width: 900px){
+    .sidebar{display:none;}
+    .kpi-row{grid-template-columns:repeat(2,1fr);}
+    .main{padding:24px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- =============== 登录页 =============== -->
+<div id="loginView" class="login-wrap hidden">
+  <div class="login-card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+      <div class="brand-logo" style="width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,var(--rose),var(--lavender));display:flex;align-items:center;justify-content:center;font-size:24px;">🌤️</div>
+      <div>
+        <div style="font-weight:800;font-size:18px;">小气候 · 管理后台</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">情侣私人天气台 · 运营端</div>
+      </div>
+    </div>
+    <div class="login-title">管理员登录</div>
+    <div class="login-sub">请输入管理员密码进入后台</div>
+    <div class="mb-4">
+      <label class="label">管理员密码</label>
+      <input id="pwd" class="field" type="password" placeholder="ADMIN_PASS" />
+    </div>
+    <button class="btn btn-primary w-full" onclick="doLogin()">登 录</button>
+    <div id="loginErr" class="err"></div>
+  </div>
+</div>
+
+<!-- =============== 主界面 =============== -->
+<div id="appView" class="app hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">🌤️</div>
+      <div>
+        <div class="brand-name">小气候</div>
+        <div class="brand-sub">情侣气象站 · Admin</div>
+      </div>
+    </div>
+    <div class="nav-item active" data-tab="overview" onclick="switchTab(this)">
+      <span class="nav-emoji">📊</span><span>数据总览</span>
+    </div>
+    <div class="nav-item" data-tab="users" onclick="switchTab(this)">
+      <span class="nav-emoji">👥</span><span>用户列表</span>
+    </div>
+    <div class="nav-item" data-tab="map" onclick="switchTab(this)">
+      <span class="nav-emoji">🗺️</span><span>地域分布</span>
+    </div>
+    <div class="sidebar-bottom">
+      <span>v1.0.0</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span class="dot"></span>在线</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="page-title">数据总览</div>
+        <div class="page-sub">欢迎回来 · 小气候管理员</div>
+      </div>
+      <div class="top-right">
+        <div class="endpoint" id="endpointEl">API: —</div>
+        <button class="btn btn-ghost" onclick="logout()">退出</button>
+      </div>
+    </div>
+
+    <!-- 总览 Tab -->
+    <section id="tab-overview">
+      <div class="kpi-row">
+        <div class="kpi-card k1"><div class="kpi-label">👥 总用户数</div><div class="kpi-value" id="kpi1">—</div></div>
+        <div class="kpi-card k2"><div class="kpi-label">💞 已绑定情侣</div><div class="kpi-value" id="kpi2">—</div></div>
+        <div class="kpi-card k3"><div class="kpi-label">🔥 今日活跃</div><div class="kpi-value" id="kpi3">—</div></div>
+        <div class="kpi-card k4"><div class="kpi-label">📝 今日记录</div><div class="kpi-value" id="kpi4">—</div></div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active">最新用户</div>
+      </div>
+      <div class="panel">
+        <table class="tbl">
+          <thead><tr>
+            <th>用户</th><th>绑定状态</th><th>所在城市</th><th>注册时间</th><th>操作</th>
+          </tr></thead>
+          <tbody id="overviewUserList"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 用户列表 Tab -->
+    <section id="tab-users" class="hidden">
+      <div class="panel">
+        <table class="tbl">
+          <thead><tr>
+            <th style="width:28%">用户</th>
+            <th>绑定状态</th>
+            <th>位置（已授权用户显示城市级）</th>
+            <th>位置更新时间</th>
+            <th>注册时间</th>
+            <th>操作</th>
+          </tr></thead>
+          <tbody id="userList"></tbody>
+        </table>
+        <div class="pagination">
+          <div id="pgInfo">—</div>
+          <div class="pager" id="pager"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 地域分布 Tab -->
+    <section id="tab-map" class="hidden">
+      <div class="panel map-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div>
+            <div style="font-size:16px;font-weight:800;">用户地域分布</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px;">按城市级聚合展示，不显示精确坐标，保护用户隐私</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="loadMap(true)">🔄 刷新</button>
+        </div>
+        <div class="map-wrap" id="mapWrap">
+          <!-- 图钉由 JS 渲染 -->
+        </div>
+        <div class="legend-row">
+          <div class="li"><span class="ld" style="background:var(--rose);"></span>华北</div>
+          <div class="li"><span class="ld" style="background:var(--lavender);"></span>华东/华南</div>
+          <div class="li"><span class="ld" style="background:var(--sun);"></span>西部/其他</div>
+          <div class="li"><span class="ld" style="background:rgba(139,128,152,.5);"></span>未授权位置</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+// ============== 基础配置 ==============
+let API_BASE = localStorage.getItem('xqh_admin_api') || '';
+let ADMIN_TOKEN = localStorage.getItem('xqh_admin_token') || '';
+
+if (!API_BASE) {
+  API_BASE = prompt('请输入你的 Cloudflare Worker 域名（如 https://xiaoqihou.xxx.workers.dev）：\n（之后会保存在浏览器 localStorage 里）', 'https://your-worker.xxx.workers.dev');
+  if (API_BASE) localStorage.setItem('xqh_admin_api', API_BASE.replace(/\/$/, ''));
+}
+document.getElementById('endpointEl').textContent = 'API: ' + (API_BASE || '未配置');
+
+function api(path, opts={}) {
+  return fetch(API_BASE + path, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': ADMIN_TOKEN ? ('Bearer ' + ADMIN_TOKEN) : '',
+      'X-Admin-Pass': ADMIN_TOKEN ? '' : (localStorage.getItem('xqh_admin_pass') || '')
+    },
+    ...opts
+  }).then(r => r.json());
+}
+
+// ============== 登录 ==============
+async function doLogin() {
+  const pwd = document.getElementById('pwd').value.trim();
+  if (!pwd) { document.getElementById('loginErr').textContent='请输入密码'; return; }
+  try {
+    const res = await api('/api/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ password: pwd })
+    });
+    if (res.code === 0 && res.data && res.data.token) {
+      ADMIN_TOKEN = res.data.token;
+      localStorage.setItem('xqh_admin_token', ADMIN_TOKEN);
+      localStorage.setItem('xqh_admin_pass', pwd);
+      document.getElementById('loginErr').textContent = '';
+      bootApp();
+    } else {
+      document.getElementById('loginErr').textContent = res.msg || '密码错误';
+    }
+  } catch (e) {
+    document.getElementById('loginErr').textContent = '网络错误：' + e.message;
+  }
+}
+
+function logout() {
+  localStorage.removeItem('xqh_admin_token');
+  ADMIN_TOKEN = '';
+  location.reload();
+}
+
+// ============== 启动 ==============
+function bootApp() {
+  if (!ADMIN_TOKEN) {
+    document.getElementById('loginView').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('appView').classList.remove('hidden');
+  loadKPI();
+  loadUsers(1);
+  loadMap();
+}
+
+async function loadKPI() {
+  try {
+    const res = await api('/api/admin/kpi');
+    if (res.code !== 0) throw new Error(res.msg);
+    const d = res.data;
+    document.getElementById('kpi1').textContent = d.total_users ?? '-';
+    document.getElementById('kpi2').textContent = d.bound_couples ?? '-';
+    document.getElementById('kpi3').textContent = d.today_active ?? '-';
+    document.getElementById('kpi4').textContent = d.today_records ?? '-';
+  } catch (e) {
+    ['kpi1','kpi2','kpi3','kpi4'].forEach(k => document.getElementById(k).textContent = '加载失败');
+  }
+}
+
+let CURRENT_PAGE = 1, TOTAL_PAGES = 1;
+
+async function loadUsers(page=1) {
+  CURRENT_PAGE = page;
+  try {
+    const size = 20;
+    const res = await api(`/api/admin/users?page=${page}&size=${size}`);
+    if (res.code !== 0) throw new Error(res.msg);
+    const { list, total } = res.data;
+    TOTAL_PAGES = Math.max(1, Math.ceil(total / size));
+    renderUserTable('userList', list);
+    // Overview 最新用户取前5
+    renderUserTable('overviewUserList', list.slice(0,5), true);
+    document.getElementById('pgInfo').textContent = `共 ${total} 个用户 · 第 ${page} / ${TOTAL_PAGES} 页`;
+    renderPager();
+  } catch (e) {
+    document.getElementById('userList').innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--danger);padding:30px;">加载失败：${e.message || e.msg}</td></tr>`;
+  }
+}
+
+function renderUserTable(tbodyId, list, simple=false) {
+  const tbody = document.getElementById(tbodyId);
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="${simple?5:6}" style="text-align:center;color:var(--muted);padding:30px;">暂无数据</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(u => {
+    const name = u.nickname || '未设置昵称';
+    const initial = (name || '小').slice(0,1);
+    const statusBadge = u.couple_status === 'bound'
+      ? '<span class="badge ok">已绑定</span>'
+      : (u.couple_status === 'pending' ? '<span class="badge wait">待绑定</span>' : '<span class="badge off">未绑定</span>');
+    const loc = !u.location_city ? '<span class="muted">—</span>'
+      : u.location_visible === 0 ? '<span class="badge off">已隐藏</span>'
+      : `<span>${escapeHtml(u.location_city)}</span>`;
+    const regDate = u.created_at ? u.created_at.slice(0,10) : '-';
+    const locTime = u.location_updated ? (u.location_updated.slice(5,16).replace('T',' ')) : '<span class="muted">—</span>';
+    const actions = `<button class="btn btn-ghost btn-sm" onclick="alert('用户详情页：${u.id}')">详情</button>`;
+    if (simple) {
+      return `<tr>
+        <td><span class="av">${initial}</span><b>${escapeHtml(name)}</b></td>
+        <td>${statusBadge}</td>
+        <td>${loc}</td>
+        <td class="muted">${regDate}</td>
+        <td>${actions}</td>
+      </tr>`;
+    }
+    return `<tr>
+      <td><span class="av">${initial}</span><b>${escapeHtml(name)}</b>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">ID: ${u.id.slice(0,8)}…</div>
+      </td>
+      <td>${statusBadge}</td>
+      <td>${loc}</td>
+      <td class="muted">${locTime}</td>
+      <td class="muted">${regDate}</td>
+      <td>${actions}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPager() {
+  const arr = [];
+  for (let i = 1; i <= TOTAL_PAGES; i++) {
+    if (TOTAL_PAGES <= 7 || Math.abs(i - CURRENT_PAGE) <= 1 || i === 1 || i === TOTAL_PAGES) {
+      arr.push(`<button class="${i===CURRENT_PAGE?'active':''}" onclick="loadUsers(${i})">${i}</button>`);
+    } else if (arr[arr.length-1] !== '…') {
+      arr.push('…');
+    }
+  }
+  document.getElementById('pager').innerHTML = arr.join('');
+}
+
+// ============== Tab 切换 ==============
+function switchTab(el) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  const tab = el.dataset.tab;
+  ['overview','users','map'].forEach(k => {
+    document.getElementById('tab-'+k).classList.toggle('hidden', k !== tab);
+  });
+  const titleMap = { overview:'数据总览', users:'用户列表', map:'地域分布' };
+  document.querySelector('.page-title').textContent = titleMap[tab];
+}
+
+// ============== 地域分布 ==============
+function loadMap() {
+  const wrap = document.getElementById('mapWrap');
+  wrap.innerHTML = '';
+  // 示例：按城市分布随机生成点（真实项目应把 D1 location_snapshots 的城市名通过逆地理聚合到经纬度）
+  const cityPoints = {
+    '北京':{x:63,y:30,cls:''}, '上海':{x:78,y:52,cls:'p2'}, '广州':{x:66,y:80,cls:'p2'}, '深圳':{x:68,y:82,cls:'p2'},
+    '杭州':{x:77,y:55,cls:'p2'}, '成都':{x:42,y:60,cls:'p3'}, '西安':{x:52,y:48,cls:'p3'}, '重庆':{x:48,y:62,cls:'p3'},
+    '武汉':{x:65,y:58,cls:'p2'}, '南京':{x:75,y:52,cls:'p2'}, '天津':{x:64,y:28,cls:''}, '苏州':{x:77,y:54,cls:'p2'},
+    '长沙':{x:62,y:68,cls:'p2'}, '郑州':{x:58,y:44,cls:''}, '青岛':{x:70,y:36,cls:''}, '沈阳':{x:75,y:20,cls:''},
+    '哈尔滨':{x:80,y:14,cls:''}, '大连':{x:74,y:28,cls:''}, '厦门':{x:70,y:78,cls:'p2'}, '福州':{x:72,y:72,cls:'p2'},
+    '昆明':{x:38,y:74,cls:'p3'}, '贵阳':{x:46,y:72,cls:'p3'}, '南宁':{x:54,y:86,cls:'p3'}, '兰州':{x:40,y:44,cls:'p3'},
+    '乌鲁木齐':{x:14,y:34,cls:'p3'}, '呼和浩特':{x:52,y:26,cls:''}, '银川':{x:46,y:40,cls:'p3'}, '太原':{x:58,y:36,cls:''},
+    '石家庄':{x:62,y:32,cls:''}, '济南':{x:66,y:40,cls:''}, '合肥':{x:72,y:54,cls:'p2'}, '南昌':{x:68,y:64,cls:'p2'},
+    '宁波':{x:78,y:56,cls:'p2'}, '无锡':{x:76,y:52,cls:'p2'}, '佛山':{x:65,y:82,cls:'p2'}, '东莞':{x:67,y:81,cls:'p2'},
+    '珠海':{x:66,y:84,cls:'p2'}, '海口':{x:60,y:94,cls:'p3'}, '三亚':{x:62,y:96,cls:'p3'}, '拉萨':{x:24,y:60,cls:'p3'}
+  };
+  const pins = [];
+  Object.entries(cityPoints).forEach(([city, p]) => {
+    // 每个城市 1~4 个图钉
+    const count = 1 + Math.floor(Math.random() * 4);
+    for (let i = 0; i < count; i++) {
+      const x = p.x + (Math.random() - 0.5) * 2.5;
+      const y = p.y + (Math.random() - 0.5) * 2.5;
+      pins.push(`<div class="map-pin ${p.cls}" style="left:${x}%;top:${y}%;" title="${city}"></div>`);
+    }
+  });
+  // 未授权位置在底部随机散落
+  for (let i = 0; i < 16; i++) {
+    pins.push(`<div class="map-pin" style="left:${8+Math.random()*84}%;top:${20+Math.random()*72}%;background:rgba(139,128,152,.45);box-shadow:0 0 0 3px rgba(139,128,152,.15);"></div>`);
+  }
+  wrap.innerHTML = pins.join('') +
+    `<div style="position:absolute;left:14px;bottom:12px;font-size:11px;color:var(--muted);background:rgba(255,255,255,.8);padding:4px 10px;border-radius:8px;">示意图 · 城市级聚合 · 非精确坐标</div>`;
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// 启动
+bootApp();
+</script>
+</body>
+</html>

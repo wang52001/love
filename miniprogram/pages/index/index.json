@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "情侣心情录",
+  "navigationBarBackgroundColor": "#FFFBF8",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#FFFBF8",
+  "enablePullDownRefresh": true,
+  "usingComponents": {}
+}

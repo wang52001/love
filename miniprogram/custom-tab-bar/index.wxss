@@ -1,0 +1,71 @@
+.tabbar-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(128rpx + env(safe-area-inset-bottom));
+  z-index: 999;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.tabbar-blur {
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  background: rgba(255, 251, 248, 0.95);
+  border-top: 1rpx solid rgba(255, 143, 171, 0.12);
+  box-shadow: 0 -12rpx 40rpx rgba(184, 169, 255, 0.08);
+}
+.tabbar-inner {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-around;
+  padding: 12rpx 0 4rpx;
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.tab-orb {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: rgba(255, 255, 255, 0.6);
+}
+.tab-emoji {
+  font-size: 36rpx;
+}
+.tab-dot {
+  position: absolute;
+  bottom: -6rpx;
+  left: 50%;
+  margin-left: -5rpx;
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: #FF8FAB;
+  box-shadow: 0 0 8rpx rgba(255, 143, 171, 0.6);
+}
+.tab-text {
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  color: #A094AC;
+  font-weight: 500;
+}
+.tab-item.active .tab-orb {
+  background: linear-gradient(135deg, #FFE8EE, #EEE9FF);
+  box-shadow: 0 6rpx 16rpx rgba(255, 143, 171, 0.2);
+  transform: translateY(-4rpx);
+}
+.tab-item.active .tab-text {
+  color: #FF8FAB;
+  font-weight: 700;
+}

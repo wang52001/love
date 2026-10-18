@@ -1,0 +1,199 @@
+<view class="container">
+  <view class="head mt-48 text-center">
+    <view class="head-emoji animate-float">💍</view>
+    <view class="page-title text-center mt-20">绑定你的另一半</view>
+    <view class="page-sub text-center mt-10" wx:if="{{!bound && !pending && !rejected}}">绑定后即可共享每日心情天气 💕</view>
+  </view>
+
+  <!-- 需要登录 -->
+  <view class="invite-panel mt-32 glass-card p-32 text-center" wx:if="{{needLogin && !loading}}">
+    <view class="muted fs-26" style="color: #FF6B6B;">⚠️ 请先登录后查看邀请码</view>
+    <view class="muted fs-22 mt-16">登录后才能生成属于你的专属邀请码</view>
+    <view class="btn btn-primary mt-32" bindtap="reLogin">💚 微信一键登录</view>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="invite-panel mt-32 glass-card p-32 text-center" wx:if="{{loading}}">
+    <view class="muted fs-26">正在加载邀请码…</view>
+  </view>
+
+  <!-- 加载失败 -->
+  <view class="invite-panel mt-32 glass-card p-32 text-center" wx:if="{{loadError && !loading && !needLogin}}">
+    <view class="muted fs-26" style="color: #FF6B6B;">{{loadError}}</view>
+    <view class="btn btn-primary mt-32" bindtap="refresh">重新加载</view>
+    <view class="btn btn-ghost mt-20" bindtap="reLogin">重新登录</view>
+  </view>
+
+  <!-- 未绑定：邀请 / 输入邀请码 -->
+  <block wx:if="{{!loading && !loadError && !needLogin && !bound && !pending && !rejected}}">
+    <view class="tabs mt-40 glass-card p-8">
+      <view class="tab-item {{tab === 0 ? 'active' : ''}}" bindtap="switchTab" data-tab="0">
+        <text class="tab-emoji">✨</text>
+        <text>我来邀请</text>
+      </view>
+      <view class="tab-item {{tab === 1 ? 'active' : ''}}" bindtap="switchTab" data-tab="1">
+        <text class="tab-emoji">🎫</text>
+        <text>输入邀请码</text>
+      </view>
+    </view>
+
+    <view class="invite-panel mt-32 glass-card p-32 text-center" wx:if="{{tab === 0}}">
+      <view class="invite-tag tag tag-rose mb-24">我的邀请码</view>
+      <view class="invite-code gradient-text fw-900">
+        <text class="code-char" wx:for="{{inviteCode}}" wx:key="*this">{{item}}</text>
+      </view>
+      <view class="invite-tip muted fs-22 mt-20">
+        把这 6 位邀请码发给 TA，TA 输入后即可绑定
+      </view>
+      <view class="invite-actions mt-32">
+        <view class="btn btn-primary btn-copy" bindtap="copy">
+          <text class="copy-emoji">📋</text>
+          <text>复制邀请码，粘贴发给 TA</text>
+        </view>
+        <view class="share-hint mt-24">
+          <view class="share-hint-row mt-10">
+            <text class="hint-icon">💌</text>
+            <text class="hint-text muted fs-22">1. 点上方复制，去微信聊天里<strong class="em">长按粘贴</strong>发给 TA</text>
+          </view>
+          <view class="share-hint-row mt-10">
+            <text class="hint-icon">📤</text>
+            <text class="hint-text muted fs-22">2. 或点右上角 <text class="hint-menu">「…」</text> 选择 <strong class="em">「转发给朋友」</strong></text>
+          </view>
+          <view class="share-hint-row mt-10">
+            <text class="hint-icon">🎯</text>
+            <text class="hint-text muted fs-22">TA 从分享卡片点进来，邀请码会 <strong class="em">自动预填</strong> 哦～</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="join-panel mt-32 glass-card p-32" wx:else>
+      <view class="join-title fw-700 fs-30 mb-8">输入 TA 的邀请码</view>
+      <view class="join-desc muted fs-22 mb-28">TA 在情侣心情录生成的 6 位邀请码</view>
+      <view class="code-inputs mt-20">
+        <view
+          class="code-cell {{inputCode[idx] ? 'filled' : ''}} {{idx === focusIdx ? 'focus' : ''}}"
+          wx:for="{{[0,1,2,3,4,5]}}"
+          wx:for-index="idx"
+          wx:key="*this"
+        >
+          <text class="code-char gradient-text fw-900" wx:if="{{inputCode[idx]}}">{{inputCode[idx]}}</text>
+        </view>
+      </view>
+      <input
+        class="hidden-input"
+        type="text"
+        maxlength="6"
+        focus="{{inputFocus}}"
+        bindinput="onCodeInput"
+        bindconfirm="submitCode"
+        bindfocus="onFocus"
+        value="{{rawInput}}"
+        confirm-type="done"
+      />
+      <view class="btn btn-primary mt-40 {{binding ? 'btn-disabled' : ''}}" bindtap="{{binding ? '' : 'submitCode'}}">
+        {{binding ? '正在绑定中…' : '💕 确认绑定'}}
+      </view>
+      <view class="tip-ask muted fs-22 mt-28 text-center" bindtap="switchTab" data-tab="0">
+        还没有邀请码？<text class="link">我来生成邀请码 ›</text>
+      </view>
+    </view>
+  </block>
+
+  <!-- 等待确认 -->
+  <view class="pending-panel mt-32 glass-card p-32 text-center" wx:if="{{!loading && !needLogin && pending}}">
+    <view class="pending-emoji animate-float">⏳</view>
+    <view class="pending-title gradient-text fw-800 fs-36 mt-16">
+      {{isA ? 'TA 申请和你绑定 💕' : '等待 TA 确认…'}}
+    </view>
+    <view class="pending-desc muted fs-24 mt-12" wx:if="{{isA}}">
+      {{ta.nickname || 'TA'}} 输入了你的邀请码，是否同意绑定？
+    </view>
+    <view class="pending-desc muted fs-24 mt-12" wx:else>
+      已把申请发给 TA，TA 确认后你们就绑定成功啦
+    </view>
+
+    <view class="pending-user row mt-28 p-28" wx:if="{{ta && ta.nickname}}">
+      <view class="side">
+        <image wx:if="{{ta.avatar_url}}" class="s-avatar ta" src="{{ta.avatar_url}}" mode="aspectFill" />
+        <view wx:else class="s-avatar ta">💗</view>
+        <view class="s-name mt-12 fw-600 fs-24">{{ta.nickname || 'TA'}}</view>
+      </view>
+    </view>
+
+    <!-- A（邀请方）：同意 / 拒绝 / 撤销邀请 -->
+    <view class="pending-actions mt-40" wx:if="{{isA}}">
+      <view class="btn btn-primary" bindtap="respond" data-action="accept">
+        ✅ 同意绑定
+      </view>
+      <view class="btn btn-ghost-rose mt-20" bindtap="respond" data-action="reject">
+        ❌ 拒绝绑定
+      </view>
+      <view class="btn btn-ghost mt-20" bindtap="respond" data-action="cancel">
+        撤销邀请
+      </view>
+    </view>
+
+    <!-- B（被邀请方）：只能取消自己的申请 -->
+    <view class="pending-actions mt-40" wx:if="{{!isA}}">
+      <view class="btn btn-ghost-rose" bindtap="respond" data-action="cancel">
+        取消申请
+      </view>
+    </view>
+  </view>
+
+  <!-- 已被拒绝 -->
+  <view class="rejected-panel mt-32 glass-card p-32 text-center" wx:if="{{!loading && !needLogin && rejected}}">
+    <view class="rejected-emoji animate-float">💔</view>
+    <view class="rejected-title gradient-text fw-800 fs-36 mt-16">
+      {{isA ? 'TA 拒绝了邀请' : '你已拒绝邀请'}}
+    </view>
+    <view class="rejected-desc muted fs-24 mt-12" wx:if="{{isA}}">
+      没关系，重新生成一个邀请码再试一次吧
+    </view>
+    <view class="rejected-desc muted fs-24 mt-12" wx:else>
+      你已拒绝 {{ta.nickname || 'TA'}} 的绑定邀请
+    </view>
+    <view class="btn btn-primary mt-40" bindtap="refresh" wx:if="{{isA}}">
+      🔄 重新生成邀请码
+    </view>
+  </view>
+
+  <!-- 已绑定 -->
+  <view class="bound-panel mt-32 glass-card p-32 text-center" wx:if="{{!loading && !needLogin && bound}}">
+    <view class="bound-emoji animate-float">🎉</view>
+    <view class="bound-desc muted fs-24 mt-12">
+      在一起第 <text class="gradient-text fw-700">{{togetherDays}}</text> 天
+    </view>
+    <view class="bound-date mt-28 row p-28">
+      <view class="side">
+        <view class="s-avatar me">💜</view>
+        <view class="s-name mt-12 fw-600 fs-24">{{me.nickname || '我'}}</view>
+      </view>
+      <view class="mid">
+        <view class="heart">💕</view>
+        <view class="since muted fs-20 mt-8">
+          {{bindDate}} 绑定
+        </view>
+      </view>
+      <view class="side">
+        <view class="s-avatar ta">💗</view>
+        <view class="s-name mt-12 fw-600 fs-24">{{ta.nickname || 'TA'}}</view>
+      </view>
+    </view>
+
+    <view class="danger mt-40">
+      <view class="danger-item muted fs-24" bindtap="unbind">
+        🔓 申请解绑情侣关系
+      </view>
+    </view>
+  </view>
+
+  <view class="go-home mt-48 mb-48">
+    <view class="btn btn-ghost-lavender" bindtap="goHome" wx:if="{{bound}}">
+      🌤️ 返回气象站
+    </view>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>

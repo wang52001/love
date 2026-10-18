@@ -1,0 +1,132 @@
+<view class="container">
+  <view class="header mt-48 mb-8">
+    <view class="page-title">明天的心情预报</view>
+    <view class="page-sub mt-8">许下你期待的心情，TA 会收到哦 💌</view>
+  </view>
+
+  <view class="my-wish glass-card mt-32" wx:if="{{myWish}}">
+    <view class="wish-tag tag tag-rose">我的心愿</view>
+    <view class="wish-main mt-20">
+      <view class="wish-orb" style="background: linear-gradient(155deg, {{myWish.colors[0]}}, {{myWish.colors[1]}});">
+        <text class="wish-emoji animate-float">{{myWish.emoji}}</text>
+      </view>
+      <view class="wish-body mt-16">
+        <view class="wish-title gradient-text fw-800 fs-32">我希望明天是 {{myWish.name}}</view>
+        <view class="wish-reason mt-12" wx:if="{{myWish.reason}}">"{{myWish.reason}}"</view>
+      </view>
+    </view>
+    <view class="modify-btn muted fs-22 mt-20" bindtap="reset">✎ 修改心愿</view>
+  </view>
+
+  <view class="editor mt-32" wx:else>
+    <view class="section-title mb-16">选择明天的心愿心情</view>
+    <view class="mood-grid">
+      <view
+        class="mood-opt glass-card {{selected === item.key ? 'active' : ''}}"
+        wx:for="{{options}}"
+        wx:key="key"
+        bindtap="pick"
+        data-key="{{item.key}}"
+      >
+        <view class="opt-orb" style="background: linear-gradient(155deg, {{item.colors[0]}}, {{item.colors[1]}});">
+          {{item.emoji}}
+        </view>
+        <view class="opt-name" style="{{selected === item.key ? 'color: #FF8FAB;' : ''}}">{{item.name}}</view>
+      </view>
+    </view>
+
+    <view class="section-title mt-40 mb-16">为什么期待这个心情？</view>
+    <view class="reason-card glass-card">
+      <textarea
+        class="reason-input"
+        placeholder="比如：明天要去看海啦～（选填，30字内）"
+        maxlength="30"
+        value="{{reason}}"
+        bindinput="onInput"
+        auto-height
+      />
+      <view class="reason-count muted fs-22 mt-8 text-right">{{reason.length}}/30</view>
+    </view>
+
+    <view class="btn btn-primary mt-40" bindtap="submit">
+      💌 许下心愿
+    </view>
+  </view>
+
+  <view class="ta-wish mt-48" wx:if="{{taWish}}">
+    <view class="section-title mb-16">TA 许下的心愿</view>
+    <view class="ta-card glass-card">
+      <view class="ta-orb" style="background: linear-gradient(155deg, {{taWish.colors[0]}}, {{taWish.colors[1]}});">
+        {{taWish.emoji}}
+      </view>
+      <view class="ta-body">
+        <view class="ta-title fw-700 fs-28">希望明天是 <text class="gradient-text">{{taWish.name}}</text></view>
+        <view class="ta-reason muted fs-24 mt-10" wx:if="{{taWish.reason}}">"{{taWish.reason}}"</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="preview mt-48" wx:if="{{matched !== null}}">
+    <view class="section-title mb-16">✨ 昨天心愿结果</view>
+    <view class="preview-card glass-card rainbow" wx:if="{{matched}}">
+      <view class="preview-emoji">🌈</view>
+      <view class="preview-title gradient-text fw-800 fs-32 mt-12">心愿成真！</view>
+      <view class="preview-desc muted fs-24 mt-12">昨天你们的心情和心愿一模一样，真幸运～</view>
+    </view>
+    <view class="preview-card glass-card" wx:else>
+      <view class="preview-emoji">☁️</view>
+      <view class="preview-title fw-700 fs-28 mt-12">差了一点点</view>
+      <view class="preview-desc muted fs-24 mt-12">昨天的实际心情和心愿差了一朵云，没关系，今天重新许～</view>
+    </view>
+  </view>
+
+  <view class="stats mt-48 mb-32">
+    <view class="stats-title section-title mb-20">📊 心愿成真记录</view>
+    <view class="stats-row glass-card p-24">
+      <view class="s-item">
+        <view class="s-num gradient-text fw-900 fs-48">{{wishStats.total}}</view>
+        <view class="s-label muted fs-22">许下心愿</view>
+      </view>
+      <view class="s-divider"></view>
+      <view class="s-item">
+        <view class="s-num rainbow-text fw-900 fs-48">{{wishStats.matched}}</view>
+        <view class="s-label muted fs-22">成真次数</view>
+      </view>
+      <view class="s-divider"></view>
+      <view class="s-item">
+        <view class="s-num fw-900 fs-48 rate">{{wishStats.rate}}%</view>
+        <view class="s-label muted fs-22">成真率</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-title mt-48 mb-20" wx:if="{{list.length}}">📜 历史心愿</view>
+  <view class="history-list" wx:if="{{list.length}}">
+    <view class="hist-row glass-card p-24 mt-16" wx:for="{{list}}" wx:key="id">
+      <view class="hist-left">
+        <view class="hist-orb" style="background: linear-gradient(135deg, {{item.colors[0]}}, {{item.colors[1]}});">
+          <text class="hist-emoji">{{item.emoji}}</text>
+        </view>
+      </view>
+      <view class="hist-body flex-1">
+        <view class="hist-head row-between">
+          <view class="hist-name fw-600 fs-28">
+            希望是 <text class="gradient-text">{{item.emotionName || '心动'}}</text>
+          </view>
+          <view class="hist-status tag {{item.status === 'done' ? 'tag-sun' : 'tag-lavender'}} fs-20">
+            {{item.status === 'done' ? '🌈 已兑现' : (item.matched ? '✨ 已匹配' : '等待中')}}
+          </view>
+        </view>
+        <view class="hist-reason muted fs-24 mt-8" wx:if="{{item.reason || item.title || item.content}}">
+          "{{item.reason || item.title || item.content}}"
+        </view>
+      </view>
+      <view class="hist-actions">
+        <view class="hist-btn" wx:if="{{item.status !== 'done'}}" bindtap="toggleStatus" data-id="{{item.id}}" data-status="done">✓</view>
+        <view class="hist-btn del" bindtap="delWish" data-id="{{item.id}}">×</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="safe-bottom"></view>
+</view>
